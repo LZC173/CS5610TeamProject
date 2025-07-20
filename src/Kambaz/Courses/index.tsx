@@ -7,6 +7,7 @@ import AssignmentEditor from "./Assignments/Editor";
 import { Route, Routes, useParams, useLocation } from "react-router";
 import { FaAlignJustify } from "react-icons/fa";
 import { courses } from "../Database";
+import Quizzes         from "./Quizzes";    
 export default function Courses() {
   const { cid } = useParams();
   const course = courses.find((course) => course._id === cid);
@@ -28,8 +29,8 @@ export default function Courses() {
           <Route path="Modules" element={<Modules />} />
           <Route path="Assignments" element={<Assignments />} />
           <Route path="Assignments/:aid" element={<AssignmentEditor />} />
-            <Route path="People" element={<PeopleTable />} />
-
+          <Route path="People" element={<PeopleTable />} />
+          <Route path="Quizzes/*"    element={<Quizzes />} />
         </Routes>
         </div></div>
 

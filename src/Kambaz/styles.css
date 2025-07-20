@@ -26,3 +26,38 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
 .wd-lesson {
   border-left: 3px solid green !important;
 }
+
+
+#wd-modules .wd-module .wd-title {
+  background-color: var(--bs-btn-bg);
+  color: var(--bs-btn-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#wd-modules .wd-lessons .wd-lesson {
+  background-color: #fff;
+  border-left: 3px solid green !important;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+#wd-modules .wd-lessons .wd-lesson:hover {
+  background-color: #f8f9fa;
+}
+
+#wd-modules .wd-lesson .fw-bold a {
+  color: #0d6efd;
+  text-decoration: none;
+}
+
+#wd-modules .wd-lesson .fw-bold a:hover {
+  text-decoration: underline;
+}
+
+#wd-modules .wd-lesson .text-secondary {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
