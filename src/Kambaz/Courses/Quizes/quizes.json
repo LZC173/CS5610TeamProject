@@ -1,0 +1,57 @@
+[
+  {
+    "quiz_id": "Q101",
+    "title": "Introduction to React Fundamentals",
+    "description": "This quiz covers the basic concepts of React including components, JSX, props, and state management. Students will be tested on their understanding of functional vs class components, the React lifecycle, and basic event handling. This assessment is designed to evaluate foundational knowledge before moving to advanced topics.",
+    "due_date_time": "2024-03-15T23:59:00",
+    "multiple_attempts_allowed": true,
+    "available_date_time": "2024-03-01T09:00:00",
+    "until_date_time": "2024-03-16T23:59:00",
+    "shuffle_answers_allowed": true,
+    "points" : 100
+  },
+  {
+    "quiz_id": "Q102",
+    "title": "Database Design and SQL Queries",
+    "description": "Comprehensive quiz on database design principles, normalization, and SQL query writing. Topics include creating tables, establishing relationships, writing complex SELECT statements with JOINs, subqueries, and aggregate functions. Students will demonstrate their ability to design efficient database schemas and write optimized queries.",
+    "due_date_time": "2024-03-20T18:00:00",
+    "multiple_attempts_allowed": false,
+    "available_date_time": "2024-03-05T08:00:00",
+    "until_date_time": "2024-03-21T18:00:00",
+    "shuffle_answers_allowed": true,
+    "points" : 100
+  },
+  {
+    "quiz_id": "Q103",
+    "title": "Data Structures and Algorithms",
+    "description": "This quiz evaluates understanding of fundamental data structures including arrays, linked lists, stacks, queues, trees, and hash tables. Students will be tested on algorithm analysis, Big O notation, sorting algorithms, and basic graph traversal methods. Emphasis on problem-solving and computational thinking.",
+    "due_date_time": "2024-03-25T22:00:00",
+    "multiple_attempts_allowed": true,
+    "available_date_time": "2024-03-10T10:00:00",
+    "until_date_time": "2024-03-26T22:00:00",
+    "shuffle_answers_allowed": false,
+    "points" : 100
+  },
+  {
+    "quiz_id": "Q104",
+    "title": "Web Security and Authentication",
+    "description": "Assessment covering web application security principles, common vulnerabilities, and authentication mechanisms. Topics include SQL injection, XSS attacks, CSRF protection, password hashing, OAuth, JWT tokens, and secure coding practices. Students will demonstrate knowledge of both attack vectors and defensive strategies.",
+    "due_date_time": "2024-04-02T20:30:00",
+    "multiple_attempts_allowed": false,
+    "available_date_time": "2024-03-15T12:00:00",
+    "until_date_time": "2024-04-03T23:59:00",
+    "shuffle_answers_allowed": true,
+    "points" : 100
+  },
+  {
+    "quiz_id": "Q105",
+    "title": "Machine Learning Basics",
+    "description": "Introduction to machine learning concepts including supervised vs unsupervised learning, training and testing data, overfitting, cross-validation, and basic algorithms like linear regression, decision trees, and k-means clustering. Students will be evaluated on their understanding of when to apply different ML techniques and how to evaluate model performance.",
+    "due_date_time": "2024-04-10T17:00:00",
+    "multiple_attempts_allowed": true,
+    "available_date_time": "2024-03-25T09:00:00",
+    "until_date_time": "2024-04-11T17:00:00",
+    "shuffle_answers_allowed": false,
+    "points" : 100
+  }
+]
