@@ -1,9 +1,137 @@
+
+import { Link, Routes, Route, useParams } from "react-router-dom";
+import { useState } from "react";
+
+
 export default function Lab1() {
+
+         //     const ewq = ["234", "345", "456"]
+     // const wer = ["123", ...ewq, "567"]
+     // const rty = wer.find((asd, bnm) => bnm === 3)
+
+    const [b, x, r] = ["p", "v", "j"];
+
+      const a = ["x", "c", "y", "d", "z"];  
+       const g = a.find((h) => h === "c");  
+       function Mnb({ d = ["c"] }) {    
+  const a = ["b", 1];           
+  const e = [...a, ...d, ...a]; 
+  return (
+    <div>
+      <p>{e}</p>        
+    </div>
+  );
+}
+
+
+  function Dsa() {
+  const q = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  return (
+    <ul>
+      {q.map((s) => (
+        <li key={s}>
+          2 x {s} = {2 * s}
+        </li>
+      ))}
+    </ul>
+  );
+}
+  function Fds() {
+  const u = [1, 9, 3, 8, 6, 5, 7, 4, 2];          // __4__=9, __5__=6
+  return (
+    <ul>
+      {u.filter((f) => f > 5)                   // __1__=filter, __2__=f, __3__=5
+        .map((s) => (
+          <li>{s}</li>                          // __6__=s
+        ))}
+    </ul>
+  );
+}
+
+function Abc() {
+  const [x, h] = useState(true);      // __1__ = x, __2__ = true
+  return (
+    <div>
+      <button onClick={() => { h(false); }}>R</button>   {/* __3__ = h, __4__ = false */}
+      <input
+        type="checkbox"
+        checked={x}
+        onChange={() => h(!x)}
+        id="s"                                           /* __5__ = s */
+      />
+      <label htmlFor="s">Q</label>
+      {x && <h1>P</h1>}
+      {!x && <h1>K</h1>}
+    </div>
+  );
+}
+
+function Rew({ d = { b: "c" } }) {  // __1__ = d
+  const a = {
+    b: "b",
+    c: 1,
+  };
+  const e = {                       // __3__ = e
+    ...a,
+    ...d,                           // __4__ = d
+  };
+  return (
+    <ul>
+      <li>{e.c}</li>               {/* __5__ = c */}
+      <li>{e.b}</li>               {/* __6__ = b */}
+    </ul>
+  );
+}
+
+function Jkl() {
+  const q = [                            // __4__ = q
+    { a: 1, w: "g" },                    // __1__ = g
+    { a: 2, w: "t" },                    // __2__ = t
+    { a: 1, w: "j" },                    // __3__ = j
+  ];
+  return (
+    <ul>
+      {
+        q.map((s, d) => (                // __8__ = map, __7__ = s, __6__ = d
+          <li key={d}>{s.w}</li>         // __5__ = w
+        ))
+      }
+    </ul>
+  );
+}
+
+
   return (
     <div id="wd-lab1">
       <h2>Lab 1</h2>
       <h3>HTML Examples</h3>
 
+
+    <div>
+      u = {b}<br />
+      w = {x}<br />
+      j = {r}
+    </div>
+    <div>output = {g}</div>;
+
+      <div>
+  <Dsa />
+      </div>
+    
+    <Mnb d={["a"]} />
+          <div>
+  <Fds />
+      </div>
+
+                <div>
+  <Abc />
+      </div>
+
+    <Rew d={{ b: "a" }} />
+
+                    <div>
+  <Jkl />
+      </div>
       {/* 1. Heading Tags */}
       <div id="wd-h-tag">
         <h4>Heading Tags</h4>

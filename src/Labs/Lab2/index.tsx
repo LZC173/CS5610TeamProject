@@ -22,6 +22,9 @@ import BootstrapNavigation from "./BootstrapNavigation";
 import { Routes, Route } from "react-router-dom";  
 import { Link } from "react-router-dom";
 export default function Lab2() {
+  
+
+
   return (
     
     <Container id="wd-lab2">

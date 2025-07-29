@@ -9,7 +9,7 @@ import Home             from "./Home";
 import PeopleTable      from "./People/Table";
 import Assignments      from "./Assignments";
 import AssignmentEditor from "./Assignments/Editor";
-
+import Quizzes from "./Quizes"; 
 import type { Course } from "./reducer";
 
 export default function Courses() {
@@ -39,6 +39,7 @@ export default function Courses() {
             <Route path="Assignments" element={<Assignments />} />
             <Route path="Assignments/:aid" element={<AssignmentEditor />} />
             <Route path="People" element={<PeopleTable />} />
+            <Route path="Quizzes/*" element={<Quizzes />} /> 
           </Routes>
         </div>
       </div>
