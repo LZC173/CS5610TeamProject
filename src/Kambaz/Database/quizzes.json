@@ -1,0 +1,106 @@
+[
+  {
+    "quizId": "q1-html",
+    "course": "RS101",
+    "title": "Q1 - HTML",
+    "description": "",
+    "dates": {
+      "availableFrom": "2025-07-01T00:00:00Z",
+      "availableUntil": "2025-08-21T13:00:00Z",
+      "dueDate": "2025-08-21T13:00:00Z"
+    },
+    "points": 29,
+    "noOfQuestions": 11
+  },
+  {
+    "quizId": "q2-css",
+    "course": "RS101",
+    "title": "Q2 - CSS",
+    "description": "",
+    "dates": {
+      "availableFrom": "2023-09-22T00:00:00Z",
+      "availableUntil": "2023-10-05T13:00:00Z",
+      "dueDate": "2023-10-05T13:00:00Z"
+    },
+    "points": 32,
+    "noOfQuestions": 7
+  },
+  {
+    "quizId": "exam1-fa23",
+    "course": "RS101",
+    "title": "EXAM 1 FA23",
+    "description": "",
+    "dates": {
+      "availableFrom": "2023-10-10T00:00:00Z",
+      "availableUntil": "2023-10-26T17:30:00Z",
+      "dueDate": "2023-10-26T17:30:00Z"
+    },
+    "points": 113,
+    "noOfQuestions": 20
+  },
+  {
+    "quizId": "q3-js-es6",
+    "course": "RS101",
+    "title": "Q3 - JS, ES6",
+    "description": "",
+    "dates": {
+      "availableFrom": "2023-10-01T00:00:00Z",
+      "availableUntil": "2023-10-15T00:00:00Z",
+      "dueDate": "2023-10-20T23:59:59Z"
+    },
+    "points": 38,
+    "noOfQuestions": 13
+  },
+  {
+    "quizId": "q3",
+    "course": "RS101",
+    "title": "Q3",
+    "description": "",
+    "dates": {
+      "availableFrom": "2023-11-01T00:00:00Z",
+      "availableUntil": "2023-11-15T00:00:00Z",
+      "dueDate": "2023-11-30T13:00:00Z"
+    },
+    "points": 31,
+    "noOfQuestions": 8
+  },
+  {
+    "quizId": "q4-node",
+    "course": "RS101",
+    "title": "Q4 - NODE",
+    "description": "",
+    "dates": {
+      "availableFrom": "2023-11-01T00:00:00Z",
+      "availableUntil": "2023-11-20T15:00:00Z",
+      "dueDate": "2023-11-20T15:00:00Z"
+    },
+    "points": 25,
+    "noOfQuestions": 4
+  },
+  {
+    "quizId": "q5-mongo",
+    "course": "RS101",
+    "title": "Q5 - MONGO",
+    "description": "",
+    "dates": {
+      "availableFrom": "2023-11-30T11:40:00Z",
+      "availableUntil": "2023-11-30T13:00:00Z",
+      "dueDate": "2023-11-30T13:00:00Z"
+    },
+    "points": 38,
+    "noOfQuestions": 10
+  },
+  {
+    "quizId": "exam2-fa23",
+    "course": "RS101",
+    "title": "EXAM 2 FA23",
+    "description": "",
+    "dates": {
+      "availableFrom": "2023-12-15T10:30:00Z",
+      "availableUntil": "2023-12-15T13:00:00Z",
+      "dueDate": "2023-12-15T13:00:00Z"
+    },
+    "points": 104,
+    "noOfQuestions": 18
+  }
+]
