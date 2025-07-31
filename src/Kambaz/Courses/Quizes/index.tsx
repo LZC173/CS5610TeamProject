@@ -66,7 +66,7 @@ export default function Quizzes() {
               }
 
 
-              const published = now > dueDate;
+              const published = now > availableFrom;
 
               return (
                 <ListGroup.Item key={q.quizId} className="wd-lesson p-3 ps-1">
