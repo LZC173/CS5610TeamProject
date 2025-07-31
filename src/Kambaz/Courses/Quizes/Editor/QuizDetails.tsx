@@ -8,7 +8,7 @@ import {Link} from "react-router-dom";
 import {useParams} from "react-router";
 
 export default function QuizDetails() {
-    const { cid, qid } = useParams();
+    const { cid, setCid } = useParams();
     const [content, setContent] = useState('');
     const [wordCount, setWordCount] = useState(0);
 

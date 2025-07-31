@@ -73,7 +73,7 @@ export default function Quizes() {
                                     <Col sm={1} className="d-flex justify-content-center">
                                         <GoRocket className="text-success bg-white" size={24}/>
                                     </Col>
-                                    <Col sm={9} className="d-flex justify-content-center">
+                                    <Col sm={9} className="d-flex">
                                         <div className="d-flex flex-column">
                                             <a href={`#/Kambaz/Courses/${cid}/Quizzes/${quiz.quiz_id}`}>
                                                 {quiz.title}
