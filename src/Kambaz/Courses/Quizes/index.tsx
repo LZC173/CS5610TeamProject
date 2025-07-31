@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ListGroup } from "react-bootstrap";
 import { useParams, Link } from "react-router-dom";
@@ -16,7 +15,7 @@ import "../../styles.css";
 export default function Quizzes() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const canEdit = currentUser.role === "FACULTY";  // can edit when it is faculty 
+  const canEdit = currentUser.role === "FACULTY";
 
   const { cid } = useParams<{ cid: string }>();
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,56 +49,71 @@ export default function Quizzes() {
           </div>
 
           <ListGroup className="wd-lessons rounded-0">
-            {filtered.map((q) => (
-              <ListGroup.Item key={q.id} className="wd-lesson p-3 ps-1">
-                <div className="d-flex align-items-start">
-                  <GoRocket className="me-2 fs-3 mt-4 text-success bg-white rounded-circle" />
+            {filtered.map((q) => {
 
-                  <div className="ms-2 flex-grow-1">
-                    <div className="fw-bold">
-                      <Link
-                        to={`/Kambaz/Courses/${cid}/Quizzes/${q.id}`}
-                        className="text-decoration-none text-dark"
-                      >
-                        {q.title}
-                      </Link>
+              const now = new Date();
+              const availableFrom = new Date(q.dates.availableFrom);
+              const availableUntil = new Date(q.dates.availableUntil);
+              const dueDate = new Date(q.dates.dueDate);
+
+              let status = "";
+              if (now < availableFrom) {
+                status = "not_available";
+              } else if (now > availableUntil) {
+                status = "closed";
+              } else {
+                status = "available";
+              }
+
+
+              const published = now > dueDate;
+
+              return (
+                <ListGroup.Item key={q.quizId} className="wd-lesson p-3 ps-1">
+                  <div className="d-flex align-items-start">
+                    <GoRocket className="me-2 fs-3 mt-4 text-success bg-white rounded-circle" />
+
+                    <div className="ms-2 flex-grow-1">
+                      <div className="fw-bold">
+                        <Link
+                          to={`/Kambaz/Courses/${cid}/Quizzes/${q.quizId}`}
+                          className="text-decoration-none text-dark"
+                        >
+                          {q.title}
+                        </Link>
+                      </div>
+                      <div className="text-secondary">
+                        {status === "closed" && (
+                          <><span className="fw-bold text-dark">Closed</span> · </>
+                        )}
+                        {status === "available" && (
+                          <><span className="fw-bold text-dark">Available</span> · </>
+                        )}
+                        {status === "not_available" && (
+                          <>
+                            <span className="fw-bold text-dark">Not available until</span>{" "}
+                            {availableFrom.toLocaleDateString()} ·{" "}
+                          </>
+                        )}
+                        {`Available from ${availableFrom.toLocaleDateString()} · Due ${dueDate.toLocaleDateString()} · `}
+{q.points} pts · {q.noOfQuestions} Questions
+                      </div>
                     </div>
-                    <div className="text-secondary">
-                      {q.availability.status === "closed" && (
-                        <><span className="fw-bold text-dark">Closed</span> · </>
+
+                    <div className="d-flex align-items-center">
+                      <QuizItemButtons published={published} />
+                      {canEdit && (
+                        <FaTrash
+                          className="text-danger fs-5 ms-3"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleDelete(q.quizId)}
+                        />
                       )}
-                      {q.availability.status === "available" && (
-                        <><span className="fw-bold text-dark">Available</span> · </>
-                      )}
-                      {q.availability.status === "not_available" && (
-                        <>
-                          <span className="fw-bold text-dark">Not available until</span>{" "}
-                          {new Date(q.availability.notAvailableUntil!).toLocaleDateString()} ·{" "}
-                        </>
-                      )}
-                      {(() => {
-                        const rawDue = q.dueDates?.[0] ?? q.availability.dueDate;
-                        return rawDue
-                          ? `Due ${new Date(rawDue).toLocaleDateString()} · `
-                          : "";
-                      })()}
-                      {q.points} pts · {q.questionCount} Questions
                     </div>
                   </div>
-
-                  <div className="d-flex align-items-center">
-                    <QuizItemButtons published={q.published} />
-                    {canEdit && (
-                      <FaTrash
-                        className="text-danger fs-5 ms-3"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleDelete(q.id)}
-                      />
-                    )}
-                  </div>
-                </div>
-              </ListGroup.Item>
-            ))}
+                </ListGroup.Item>
+              );
+            })}
           </ListGroup>
         </ListGroup.Item>
       </ListGroup>

@@ -1,21 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import dbQuizzes from "../../Database/quizzes.json"; 
+import dbQuizzes from "../../Database/quizzes.json";
 import { v4 as uuidv4 } from "uuid";
 
 export interface Quiz {
-  id: string;
+  quizId: string;
   course: string;
   title: string;
-  availability: {
-    status: string;
-    dueDate?: string;
-    notAvailableUntil?: string;
+  description: string;
+  dates: {
+    availableFrom: string;
+    availableUntil: string;
+    dueDate: string;
   };
-  dueDates?: string[];
   points: number;
-  questionCount: number;
-  published: boolean;
+  noOfQuestions: number;
 }
 
 interface QuizzesState {
@@ -33,22 +32,22 @@ const quizzesSlice = createSlice({
     addQuiz: (
       state,
       action: PayloadAction<{
-        id?: string;
+        quizId?: string;
         course: string;
         title: string;
-        availability: Quiz["availability"];
+        description: string;
+        dates: Quiz["dates"];
         points: number;
-        questionCount: number;
-        published: boolean;
+        noOfQuestions: number;
       }>
     ) => {
       const p = action.payload;
-      const id = p.id ?? uuidv4();
-      state.quizzes.push({ ...p, id });
+      const quizId = p.quizId ?? uuidv4();
+      state.quizzes.push({ ...p, quizId });
     },
 
     deleteQuiz: (state, action: PayloadAction<string>) => {
-      state.quizzes = state.quizzes.filter((q) => q.id !== action.payload);
+      state.quizzes = state.quizzes.filter((q) => q.quizId !== action.payload);
     },
 
     updateQuiz: (
@@ -60,7 +59,7 @@ const quizzesSlice = createSlice({
     ) => {
       const { originalId, updated } = action.payload;
       state.quizzes = state.quizzes.map((q) =>
-        q.id === originalId ? updated : q
+        q.quizId === originalId ? updated : q
       );
     },
   },
