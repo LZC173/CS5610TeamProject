@@ -3,19 +3,6 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import quizzes from "../../Database/quizzes.json";
 import { v4 as uuidv4 } from "uuid";
 
-export interface Quiz {
-  quizId: string;
-  course: string;
-  title: string;
-  description: string;
-  dates: {
-    availableFrom: string;
-    availableUntil: string;
-    dueDate: string;
-  };
-  points: number;
-  noOfQuestions: number;
-}
 
 interface QuizzesState {
   quizzes: Quiz[];
