@@ -5,12 +5,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { GoRocket } from "react-icons/go";
 import { FaCaretDown, FaTrash } from "react-icons/fa";
 
-import QuizzesControls from "./QuizzesControls";
-import QuizItemButtons from "./QuizItemButtons";
-import { deleteQuiz } from "./reducer";
+import QuizzesControls from "./QuizzesControls.tsx";
+import QuizItemButtons from "./QuizItemButtons.tsx";
+import { deleteQuiz } from "./reducer.ts";
 
-import type { Quiz } from "./reducer";
-import "../../styles.css";
+import type { Quiz } from "./reducer.ts";
 
 export default function Quizzes() {
   const dispatch = useDispatch();
@@ -20,7 +19,7 @@ export default function Quizzes() {
   const { cid } = useParams<{ cid: string }>();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const quizzes = useSelector((state: any) => state.quizzesReducer.quizzes) as Quiz[];
+  const {quizzes} = useSelector((state: any) => state.quizzesReducer) as Quiz[];
 
   const filtered = quizzes
     .filter((q) => q.course === cid)
