@@ -1,12 +1,12 @@
 import {useState} from "react";
-import * as db from '../../../Database';
-import {Button, Col, ListGroup, Row} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import { MdModeEdit, MdDelete } from "react-icons/md";
 import QuestionEditor from "./QuestionEditor.tsx";
 
-export default function QuizQuestions() {
+// @ts-ignore
+export default function QuizQuestions({questionsList}) {
 
-    const [questions, setQuestions] = useState(db.questions)
+    const [questions, setQuestions] = useState(questionsList)
     const [currentScreen, setCurrentScreen] = useState('list'); // 'list' or 'edit'
     const [selectedQuestion, setSelectedQuestion] = useState(null);
 
@@ -16,6 +16,7 @@ export default function QuizQuestions() {
     };
 
     const handleEditQuestion = (question) => {
+        console.log(question)
         setSelectedQuestion(question);
         setCurrentScreen('edit');
     };

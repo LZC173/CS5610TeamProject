@@ -1,4 +1,5 @@
 import axios from "axios";
+const axiosWithCredentials = axios.create({ withCredentials: true });
 
 const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 export const fetchQuizzes = async (courseId: string) => {
@@ -6,7 +7,7 @@ export const fetchQuizzes = async (courseId: string) => {
     return response.data;
 };
 export const fetchDetails = async (quizId: string) => {
-    const response =  await axios.get(`${REMOTE_SERVER}/api/quiz/${quizId}`);
+    const response =  await axiosWithCredentials.get(`${REMOTE_SERVER}/api/quiz/${quizId}`);
     return response.data;
 }
 export const createQuiz = async (quiz: any) => {

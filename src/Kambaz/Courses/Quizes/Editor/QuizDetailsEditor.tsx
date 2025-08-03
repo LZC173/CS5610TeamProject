@@ -7,11 +7,15 @@ import './style.css';
 import {Link} from "react-router-dom";
 import {useParams} from "react-router";
 
-export default function QuizDetails() {
+// @ts-ignore
+export default function QuizDetailsEditor({details}) {
     const { cid, setCid } = useParams();
-    const [content, setContent] = useState('');
+    const [content, setContent] = useState(details.description);
     const [wordCount, setWordCount] = useState(0);
-
+    const formatDateForInput = (isoDate) => {
+        if (!isoDate) return "";
+        return new Date(isoDate).toISOString().slice(0, 16);
+    };
     return (
         <div className="mb-4 p-3">
             <Form>
@@ -19,7 +23,7 @@ export default function QuizDetails() {
                     <Form.Control
                         id="wd-name"
                         type="text"
-                        defaultValue={'unnamed assignment'}/>
+                        defaultValue={details.title}/>
                 </Form.Group>
 
                 <div className = "description_editor">
@@ -146,7 +150,7 @@ export default function QuizDetails() {
                                     <Form.Control
                                         id="wd-due-date"
                                         type="datetime-local"
-                                        defaultValue="2024-05-13T23:59"/>
+                                        defaultValue={formatDateForInput(details.dates.dueDate)}/>
                                 </Form.Group>
 
                                 <Row>
@@ -156,7 +160,7 @@ export default function QuizDetails() {
                                             <Form.Control
                                                 id="wd-available-from"
                                                 type="datetime-local"
-                                                defaultValue="2024-05-06T12:00"/>
+                                                defaultValue={formatDateForInput(details.dates.availableFrom)}/>
                                         </Form.Group>
                                     </Col>
                                     <Col md={6}>
@@ -165,7 +169,7 @@ export default function QuizDetails() {
                                             <Form.Control
                                                 id="wd-available-until"
                                                 type="datetime-local"
-                                                defaultValue="2024-05-20T23:59"
+                                                defaultValue={formatDateForInput(details.dates.availableUntil)}
                                             />
                                         </Form.Group>
                                     </Col>

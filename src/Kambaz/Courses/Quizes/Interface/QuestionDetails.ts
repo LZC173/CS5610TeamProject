@@ -1,5 +1,4 @@
-export interface QuestionDetails {
-    quizId: string,
+export default interface QuestionDetails {
     questionId: string,
     questionTitle: string,
     questionDescription: string,

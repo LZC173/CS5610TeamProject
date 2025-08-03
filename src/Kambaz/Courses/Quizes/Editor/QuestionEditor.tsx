@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type {QuestionDetails} from "./Interfaces/QuestionDetails.ts";
+import type QuestionDetails from "../Interface/QuestionDetails";
 import ReactQuill from "react-quill";
 import {FaRegKeyboard} from "react-icons/fa";
 import {Button} from "react-bootstrap";
@@ -9,13 +9,12 @@ interface Props {
 }
 
 export default function QuestionEditor({ question }: Props) {
-    const [questionType, setQuestionType] = useState('multiple-choice');
+    const [questionType, setQuestionType] = useState('multi-select');
     const [points, setPoints] = useState(4);
     const [questionText, setQuestionText] = useState('');
     const [answers, setAnswers] = useState(['', '']);
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [wordCount, setWordCount] = useState(0)
-
     useEffect(() => {
         if (question) {
             setQuestionType(question.questionType);
@@ -24,8 +23,9 @@ export default function QuestionEditor({ question }: Props) {
             setAnswers(question.possibleAnswers.length > 0 ? question.possibleAnswers : ['', '']);
             setCorrectAnswer(question.correctAnswers);
             setWordCount(question.questionDescription.length);
+            console.log(question.possibleAnswers)
         } else {
-            setQuestionType('multiple-choice');
+            setQuestionType('multi-select');
             setPoints(4);
             setQuestionText('');
             setAnswers(['', '']);
@@ -35,10 +35,11 @@ export default function QuestionEditor({ question }: Props) {
     }, [question]);
 
     const handleQuestionTypeChange = (type: string) => {
+        console.log("triggered")
         setQuestionType(type);
         setCorrectAnswer('');
 
-        if (type === 'multiple-choice') {
+        if (type === 'multi-select') {
             setAnswers(['', '']);
         } else if (type === 'true-false') {
             setAnswers(['True', 'False']);
@@ -48,13 +49,13 @@ export default function QuestionEditor({ question }: Props) {
     };
 
     const addAnswerOption = () => {
-        if (questionType === 'multiple-choice' && answers.length < 6) {
+        if (questionType === 'multi-select' && answers.length < 6) {
             setAnswers([...answers, '']);
         }
     };
 
     const removeAnswerOption = (index: number) => {
-        if (questionType === 'multiple-choice' && answers.length > 2) {
+        if (questionType === 'multi-select' && answers.length > 2) {
             const newAnswers = answers.filter((_, i) => i !== index);
             setAnswers(newAnswers);
             // Clear correct answer if it was the removed option
@@ -85,7 +86,7 @@ export default function QuestionEditor({ question }: Props) {
                             value={questionType}
                             onChange={(e) => handleQuestionTypeChange(e.target.value)}
                             style={{width: '20vw'}}>
-                            <option value="multiple-choice">Multiple Choice</option>
+                            <option value="multi-select">Multi Select</option>
                             <option value="true-false">True/False</option>
                             <option value="fill-in-blank">Fill in the Blank</option>
                         </select>
@@ -168,7 +169,7 @@ export default function QuestionEditor({ question }: Props) {
                 <div className="col-12">
                     <label className="form-label fw-bold">Answers:</label>
 
-                    {questionType === 'multiple-choice' && (
+                    {questionType === 'multi-select' && (
                         <div>
                             {answers.map((answer, index) => (
                                 <div key={index} className="d-flex align-items-center mb-3">
