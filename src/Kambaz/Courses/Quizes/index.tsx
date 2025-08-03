@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { ListGroup } from "react-bootstrap";
 import { useParams, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -7,9 +7,10 @@ import { FaCaretDown, FaTrash } from "react-icons/fa";
 
 import QuizzesControls from "./QuizzesControls.tsx";
 import QuizItemButtons from "./QuizItemButtons.tsx";
-import { deleteQuiz } from "./reducer.ts";
+import {deleteQuiz, setQuizzes} from "./reducer.ts";
 
-import type { Quiz } from "./reducer.ts";
+import type {QuizzesState} from "./reducer.ts";
+import * as quizzesClient from "./client.ts";
 
 export default function Quizzes() {
   const dispatch = useDispatch();
@@ -19,17 +20,27 @@ export default function Quizzes() {
   const { cid } = useParams<{ cid: string }>();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const {quizzes} = useSelector((state: any) => state.quizzesReducer) as Quiz[];
+  const {quizzes} = useSelector((state: any) => state.quizzesReducer) as QuizzesState;
 
   const filtered = quizzes
-    .filter((q) => q.course === cid)
     .filter((q) => q.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this quiz?")) {
+      await quizzesClient.deleteQuiz(id);
       dispatch(deleteQuiz(id));
     }
   };
+
+  const fetchQuizzes = async (courseId: string) => {
+    const quizzes = await quizzesClient.fetchQuizzes(courseId as string);
+    console.log(quizzes);
+    dispatch(setQuizzes(quizzes))
+  }
+
+  useEffect(() => {
+    fetchQuizzes(cid as string);
+  }, []);
 
   return (
     <div>

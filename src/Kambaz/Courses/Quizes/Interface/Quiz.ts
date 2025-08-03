@@ -1,4 +1,4 @@
-export interface Quiz {
+export default interface Quiz {
     quizId: string;
     course: string;
     title: string;

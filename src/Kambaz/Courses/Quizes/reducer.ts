@@ -1,21 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import quizzes from "../../Database/quizzes.json";
 import { v4 as uuidv4 } from "uuid";
+import type Quiz from "./Interface/Quiz.ts";
 
 
-interface QuizzesState {
+export interface QuizzesState {
   quizzes: Quiz[];
 }
 
 const initialState: QuizzesState = {
-  quizzes: quizzes,
+  quizzes: [],
 };
 
 const quizzesSlice = createSlice({
   name: "quizzes",
   initialState,
   reducers: {
+    setQuizzes : (state, action) => {
+        state.quizzes = action.payload;
+    },
     addQuiz: (
       state,
       action: PayloadAction<{
@@ -52,5 +55,5 @@ const quizzesSlice = createSlice({
   },
 });
 
-export const { addQuiz, deleteQuiz, updateQuiz } = quizzesSlice.actions;
+export const { addQuiz, deleteQuiz, updateQuiz, setQuizzes } = quizzesSlice.actions;
 export default quizzesSlice.reducer;
