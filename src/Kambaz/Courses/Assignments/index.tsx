@@ -10,7 +10,10 @@ import "./style.css";
 import { MdArrowDropDown } from "react-icons/md";
 import {Link, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {deleteAssignment} from "./reducer.ts";
+import {deleteAssignment, setAssignments } from "./reducer.ts";
+import * as coursesClient from "../client.ts";
+import * as assignmentClient from "./client.ts";
+import {useEffect} from "react";
 
 export default function Assignments() {
     const { cid } = useParams();
@@ -36,6 +39,18 @@ export default function Assignments() {
 
         return `${month} ${day} at ${time}`;
     };
+    const fetchAssignments = async () => {
+        const assignments = await coursesClient.findAssignmentsForCourse(cid as string);
+        dispatch(setAssignments(assignments));
+    };
+    const removeAssignment = async (assignmentId: string) => {
+        await assignmentClient.deleteAssignment(assignmentId);
+        dispatch(deleteAssignment(assignmentId))
+    }
+
+    useEffect(() => {
+        fetchAssignments();
+    }, []);
     return (
         <div id="wd-assignments">
             <div id="wd-assignments-controls" className="d-flex justify-content-between align-items-center mb-4">
@@ -118,7 +133,7 @@ export default function Assignments() {
                                         </Col>
                                         <Col sm={2} className="d-flex justify-content-center">
                                             <AssignmentControls assignmentId={assignment._id} isFaculty={isFaculty} deleteAssignment={(assignmentId) => {
-                                                dispatch(deleteAssignment(assignmentId))
+                                                removeAssignment(assignmentId)
                                             }}/>
                                         </Col>
                                     </Row>

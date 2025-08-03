@@ -3,10 +3,11 @@ import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {addAssignment, updateAssignment} from "./reducer.ts";
+import * as courseClient from "../client.ts";
+import * as assignmentClient from "./client.ts";
 
 export default function AssignmentEditor() {
     const { cid, aid } = useParams();
-    console.log(cid, aid)
     const assignmentsState = useSelector((state: any) => state.assignmentsReducer);
     const assignment = aid ? assignmentsState.assignments.find((assignment: any) => assignment.course === cid  && assignment._id === aid ) : {};
     const dispatch = useDispatch();
@@ -45,7 +46,7 @@ export default function AssignmentEditor() {
 
     const defaultDates = getDefaultDates();
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
@@ -61,19 +62,17 @@ export default function AssignmentEditor() {
             availableDate: formData.get('availableDate') as string || "",
             availableUntil: formData.get('availableUntil') as string || ""
         };
-        console.log(assignmentData)
 
         if (aid) {
-            dispatch(updateAssignment({
+            const updatedAssignment = {
                 _id: aid,
                 ...assignmentData,
-                course: cid
-            }));
+            }
+            const data = await assignmentClient.updateAssignment(updatedAssignment);
+            dispatch(updateAssignment(data));
         } else {
-            dispatch(addAssignment({
-                ...assignmentData,
-                course: cid
-            }));
+            const newAssignment  = await courseClient.createAssignmentForCourse(cid, assignmentData);
+            dispatch(addAssignment(newAssignment));
         }
         navigate(`/Kambaz/Courses/${cid}/Assignments`);
     };

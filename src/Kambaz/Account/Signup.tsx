@@ -21,7 +21,7 @@ export default function Signup() {
             <FormControl value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })}
                          className="wd-password mb-2" placeholder="password" type="password"/>
             <button onClick={signup} className="wd-signup-btn btn btn-primary mb-2 w-100"> Sign up </button><br />
-            <Link to="/Kambaz/Account/Signin" className="wd-signin-link">Sign in</Link>
+            <Link to="/Kambaz/Account/Signin" className="wd-signin-link link-primary text-decoration-underline">Sign in</Link>
         </div>
     );
 }
