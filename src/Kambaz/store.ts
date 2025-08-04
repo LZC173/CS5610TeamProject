@@ -5,6 +5,7 @@ import assignmentsReducer from "./Courses/Assignments/reducer";
 import coursesReducer from "./Courses/reducer.ts";
 import enrollmentsReducer from "./Courses/enrollmentsReducer.tsx";
 import quizzesReducer from "./Courses/Quizes/reducer.ts";
+import editorReducer from "./Courses/Quizes/Editor/reducer.ts";
 const store = configureStore({
     reducer: {
         modulesReducer,
@@ -12,7 +13,8 @@ const store = configureStore({
         assignmentsReducer,
         coursesReducer,
         enrollmentsReducer,
-        quizzesReducer
+        quizzesReducer,
+        editorReducer
     },
 });
 export default store;

@@ -10,11 +10,11 @@ export const fetchDetails = async (quizId: string) => {
     const response =  await axiosWithCredentials.get(`${REMOTE_SERVER}/api/quiz/${quizId}`);
     return response.data;
 }
-export const createQuiz = async (quiz: any) => {
-    const response = await axios.put(`${REMOTE_SERVER}/api/quiz`, quiz);
-    return response.data;
-}
 export const deleteQuiz = async (quizId: string) => {
     const response =  await axios.delete(`${REMOTE_SERVER}/api/quiz/${quizId}`);
     return response.data
+}
+export const createNew =  async (quiz: any, courseId: string) => {
+    const response = await axios.put(`${REMOTE_SERVER}/api/updateQuiz/${courseId}`, quiz);
+    return response.data;
 }

@@ -6,6 +6,7 @@ import QuizDetailsEditor from "./QuizDetailsEditor.tsx";
 import QuizQuestions from "./QuizQuestions.tsx";
 import * as quizClient from "../client.ts";
 import {useParams} from "react-router-dom";
+import {Button} from "react-bootstrap";
 
 export default function QuizEditor() {
     const [points, setPoints] = useState(0);
@@ -31,6 +32,107 @@ export default function QuizEditor() {
     const handleTabClick = (tabName: string) => {
         setSelectedTab(tabName);
     };
+
+    const newQuiz = {
+        quizId: null,
+        quizDetails: {
+            title: "New Quiz",
+            description : "New Description",
+            dates:{
+                availableFrom: new Date().toDateString(),
+                availableUntil: new Date().toDateString(),
+                dueDate: new Date().toDateString()
+            },
+            multipleAttempts: true,
+            numberOfAttempts: 3
+        },
+        questions: {
+            deleteQuestionsIds: null,
+            updatedQuestions: null,
+            newQuestions: [
+                {
+                    questionId: "mc_001",
+                    questionTitle: "Photosynthesis Process",
+                    questionDescription: "Which of the following best describes the process by which plants convert sunlight into energy?",
+                    questionType: "multi-select",
+                    possibleAnswers: [
+                        "To produce oxygen for animals",
+                        "To convert sunlight into chemical energy",
+                        "To absorb carbon dioxide from air",
+                        "To create chlorophyll"
+                    ],
+                    correctAnswers: "To convert sunlight into chemical energy",
+                    points: 2
+                },
+                {
+                    questionId: "tf_001",
+                    questionTitle: "JavaScript Variable Declaration",
+                    questionDescription: "True or False: In JavaScript, variables declared with 'const' can be reassigned after declaration.",
+                    questionType: "true-false",
+                    possibleAnswers: [
+                        "True",
+                        "False"
+                    ],
+                    correctAnswers: "False",
+                    points: 1
+                }
+            ]
+        }
+    }
+
+    const editQuiz = {
+        quizId: "q1-html",
+        quizDetails: {
+            title: "Q1 - HTML",
+            description : "New Description",
+            dates:{
+                availableFrom: new Date().toDateString(),
+                availableUntil: new Date().toDateString(),
+                dueDate: new Date().toDateString()
+            },
+            multipleAttempts: true,
+            numberOfAttempts: 3
+        },
+        questions: {
+            deleteQuestionsIds: ["mc_001"],
+            updatedQuestions: [
+                {
+                    questionId: "tf_001",
+                    questionTitle: "JavaScript Variable Declaration",
+                    questionDescription: "True or False: In JavaScript, variables declared with 'const' can be reassigned after declaration.",
+                    questionType: "multi-select",
+                    possibleAnswers: [
+                        "To produce oxygen for animals",
+                        "To convert sunlight into chemical energy",
+                        "To absorb carbon dioxide from air",
+                        "To create chlorophyll"
+                    ],
+                    correctAnswers: "To convert sunlight into chemical energy",
+                    points: 1
+                }
+            ],
+            newQuestions: [
+                {
+                    questionId: "tf_002",
+                    questionTitle: "JavaScript Variable Declaration",
+                    questionDescription: "True or False: In JavaScript, variables declared with 'const' can be reassigned after declaration.",
+                    questionType: "true-false",
+                    possibleAnswers: [
+                        "True",
+                        "False"
+                    ],
+                    correctAnswers: "False",
+                    points: 1
+                }
+            ]
+        }
+    }
+
+    const saveHandler = async(quiz: any, cid: string) => {
+        const response = await quizClient.createNew(quiz, cid);
+        console.log(response);
+    }
+
 
     const fetchDetails = async (quizId : string) => {
         const quizDetails = await quizClient.fetchDetails(quizId);
@@ -88,6 +190,8 @@ export default function QuizEditor() {
                         </Nav.Item>
                     </Nav>
                 </div>
+                <Button onClick={()=> {saveHandler(newQuiz, cid as string)}}> Save New Quiz</Button>
+                <Button onClick={()=> {saveHandler(editQuiz, cid as string)}}> Edit Quiz</Button>
 
                 <div className="container-fluid">
                     {selectedTab === "Details" && <QuizDetailsEditor details={quiz.details}/>}
