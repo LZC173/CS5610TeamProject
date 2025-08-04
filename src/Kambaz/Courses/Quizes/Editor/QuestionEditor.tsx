@@ -3,6 +3,7 @@ import type QuestionDetails from "../Interface/QuestionDetails";
 import ReactQuill from "react-quill";
 import {FaRegKeyboard} from "react-icons/fa";
 import {Button} from "react-bootstrap";
+import {useDispatch} from "react-redux";
 
 interface Props {
     question: QuestionDetails | null;
@@ -14,7 +15,11 @@ export default function QuestionEditor({ question }: Props) {
     const [questionText, setQuestionText] = useState('');
     const [answers, setAnswers] = useState(['', '']);
     const [correctAnswer, setCorrectAnswer] = useState('');
-    const [wordCount, setWordCount] = useState(0)
+    const [wordCount, setWordCount] = useState(0);
+    const dispatch = useDispatch();
+
+    
+
     useEffect(() => {
         if (question) {
             setQuestionType(question.questionType);

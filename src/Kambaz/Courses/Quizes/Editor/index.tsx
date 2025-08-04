@@ -7,6 +7,8 @@ import QuizQuestions from "./QuizQuestions.tsx";
 import * as quizClient from "../client.ts";
 import {useParams} from "react-router-dom";
 import {Button} from "react-bootstrap";
+import {useDispatch, useSelector} from "react-redux";
+import {setDetails, setQuestions} from "./reducer.ts";
 
 export default function QuizEditor() {
     const [points, setPoints] = useState(0);
@@ -14,21 +16,8 @@ export default function QuizEditor() {
     const [selectedTab, setSelectedTab] = useState('Details');
     const [loaded, setLoaded] = useState(false);
     const { cid, qid } = useParams<{ cid: string,qid: string }>();
-    const [quiz, setQuiz] = useState({
-        courseId: cid as string,
-        details: {
-            dates: {
-                availableFrom: new Date().toDateString(),
-                availableUntil: new Date().toDateString(),
-                dueDate: new Date().toDateString()
-            },
-            points: 0,
-            noOfQuestions: 0,
-            description: "",
-            title: ""
-        },
-        questions: []
-    });
+    const details = useSelector((state: any)=> state.editorReducer.details);
+    const questions = useSelector((state: any) => state.editorReducer.questions);
     const handleTabClick = (tabName: string) => {
         setSelectedTab(tabName);
     };
@@ -133,10 +122,12 @@ export default function QuizEditor() {
         console.log(response);
     }
 
+    const dispatch = useDispatch();
 
     const fetchDetails = async (quizId : string) => {
         const quizDetails = await quizClient.fetchDetails(quizId);
-        setQuiz(quizDetails)
+        dispatch(setDetails(quizDetails.details))
+        dispatch(setQuestions(quizDetails.questions));
         setPoints(quizDetails.details.points)
         setLoaded(true);
     }
@@ -194,8 +185,8 @@ export default function QuizEditor() {
                 <Button onClick={()=> {saveHandler(editQuiz, cid as string)}}> Edit Quiz</Button>
 
                 <div className="container-fluid">
-                    {selectedTab === "Details" && <QuizDetailsEditor details={quiz.details}/>}
-                    {selectedTab === "Questions" && <QuizQuestions questionsList={quiz.questions}/>}
+                    {selectedTab === "Details" && <QuizDetailsEditor details={details}/>}
+                    {selectedTab === "Questions" && <QuizQuestions questionsList={questions}/>}
                 </div>
             </div>
         )

@@ -3,6 +3,17 @@ import { v4 as uuidv4 } from "uuid";
 
 
 const initialState = {
+    details: {
+        dates: {
+            availableFrom: new Date().toDateString(),
+            availableUntil: new Date().toDateString(),
+            dueDate: new Date().toDateString()
+        },
+        points: 0,
+        noOfQuestions: 0,
+        description: "",
+        title: ""
+    },
     questions: [],
     updatedQuestionIds: new Set<string>(),
     deleteQuestionIds: new Set<string>(),
@@ -13,6 +24,9 @@ const editorSlices = createSlice({
     name: "editor",
     initialState,
     reducers: {
+        setDetails: (state, action) => {
+            state.details = action.payload;
+        },
         setQuestions: (state, action) => {
             state.questions = action.payload
         },
@@ -53,5 +67,5 @@ const editorSlices = createSlice({
     }
 })
 
-export const {setQuestions, addQuestion, deleteQuestion, updateQuestion} = editorSlices.actions;
+export const {setDetails, setQuestions, addQuestion, deleteQuestion, updateQuestion} = editorSlices.actions;
 export default editorSlices.reducer;
