@@ -274,8 +274,8 @@ export default function QuizDetailsEditor({details}) {
                         Cancel
                     </Button>
                     <Button variant="danger" onClick={handleSave}>
-                        Save
-                    </Button>
+                    Save
+                </Button>
                 </div>
             </Form>
         </div>
