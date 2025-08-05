@@ -1,22 +1,41 @@
+
+
 import {useState} from "react";
 import {Button} from "react-bootstrap";
 import { MdModeEdit, MdDelete } from "react-icons/md";
 import QuestionEditor from "./QuestionEditor.tsx";
+import type QuestionDetails from "../Interface/QuestionDetails";
+import { useSelector, useDispatch } from "react-redux"; 
 
+import { deleteQuestion } from "./reducer";             
 // @ts-ignore
-export default function QuizQuestions({questionsList}) {
 
-    const [questions, setQuestions] = useState(questionsList)
+import { createNew } from '../client';
+import { useNavigate, useParams } from 'react-router-dom';
+import type EditQuiz from '../Interface/EditQuiz';
+
+export default function QuizQuestions() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();  
+
+    
+ const details    = useSelector((state: any) => state.editorReducer.details);
+  const questions  = useSelector((state: any) => state.editorReducer.questions as QuestionDetails[]);
+  const newIds     = useSelector((state: any) => state.editorReducer.newQuestionIds)    as Set<string>;
+  const updatedIds = useSelector((state: any) => state.editorReducer.updatedQuestionIds) as Set<string>;
+  const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestionIds)  as Set<string>;
+
+
     const [currentScreen, setCurrentScreen] = useState('list'); // 'list' or 'edit'
-    const [selectedQuestion, setSelectedQuestion] = useState(null);
-
+    const [selectedQuestion, setSelectedQuestion] = useState<QuestionDetails | null>(null);
+    const { cid, qid } = useParams<{ cid: string; qid: string }>();
     const handleNewQuestion = () => {
         setSelectedQuestion(null);
         setCurrentScreen('edit');
     };
 
-    const handleEditQuestion = (question) => {
-        console.log(question)
+    const handleEditQuestion = (question: QuestionDetails): void => {
+        console.log(question);
         setSelectedQuestion(question);
         setCurrentScreen('edit');
     };
@@ -27,15 +46,47 @@ export default function QuizQuestions({questionsList}) {
         }
     };
 
-    const handleSave = () => {
-        if(currentScreen === "edit") {
-            setCurrentScreen('list');
-        }
+
+    // for question editor .led back to list 
+      const handleSave = () => {
+
+        if (currentScreen === "edit") setCurrentScreen("list");
     };
 
-    const handleDeleteQuestion = (index: number) => {
-        if (window.confirm('Are you sure you want to delete this question?')) {
-            setQuestions(questions.filter((_, i) => i !== index));
+
+            function buildPayload(): EditQuiz {
+    return {
+        quizId: qid ?? null,
+        quizDetails: details,
+        questions: {
+        quizId: qid ?? null,
+        deleteQuestionsIds: Array.from(deletedIds),
+        updatedQuestions: questions.filter(q => updatedIds.has(q.questionId!)),
+        newQuestions:     questions.filter(q => newIds.has(q.questionId!)),
+        }
+    };
+    }
+    // save all !!!!!!!!!! 
+    const handleSaveAll = async () => 
+        {
+        setCurrentScreen('list');   
+        const payload = buildPayload();  
+        try {
+            await createNew(payload, cid!);
+            console.log('save succeed');
+            navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+        } catch(err) {
+            console.error('save fail ', err);
+        }
+        };
+
+
+          const handleDeleteQuestion = (index: number): void => {
+        if (window.confirm("Are you sure you want to delete this question?")) {
+        const q = questions[index];
+        if (q.questionId) {
+            dispatch(deleteQuestion(q.questionId));
+        }
         }
     };
 
@@ -86,14 +137,16 @@ export default function QuizQuestions({questionsList}) {
                         <Button variant="secondary" className="me-2" onClick={handleCancel}>
                             Cancel
                         </Button>
-                        <Button variant="danger" onClick={handleSave}>
-                            Save
-                        </Button>
+                        
+                        <Button variant="danger" onClick={handleSaveAll}>Save!!!!!!</Button>
                     </div>
                 </div>
 
             ) : (
-                <QuestionEditor question={selectedQuestion}/>
+                  <QuestionEditor
+                question={selectedQuestion}
+                onSave={handleSave}             
+                />
             )}
 
         </div>

@@ -9,19 +9,26 @@ import {useParams} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
 import {setDetails, setQuestions} from "./reducer.ts";
+import { fetchDetails, createNew } from "../client";
+import type EditQuiz from "../Interface/EditQuiz";
 
+import type QuestionDetails from "../Interface/QuestionDetails";
 export default function QuizEditor() {
     const [points, setPoints] = useState(0);
     const [quizSate, setQuizSate] = useState('Not Published');
     const [selectedTab, setSelectedTab] = useState('Details');
     const [loaded, setLoaded] = useState(false);
     const { cid, qid } = useParams<{ cid: string,qid: string }>();
-    const details = useSelector((state: any)=> state.editorReducer.details);
-    const questions = useSelector((state: any) => state.editorReducer.questions);
+
     const handleTabClick = (tabName: string) => {
         setSelectedTab(tabName);
     };
 
+    const details    = useSelector((state: any) => state.editorReducer.details);
+const questions  = useSelector((state: any) => state.editorReducer.questions);
+const newIds     = useSelector((state: any) => state.editorReducer.newQuestionIds)    as Set<string>;
+const updatedIds = useSelector((state: any) => state.editorReducer.updatedQuestionIds) as Set<string>;
+const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestionIds)  as Set<string>;
     const newQuiz = {
         quizId: null,
         quizDetails: {
@@ -140,6 +147,22 @@ export default function QuizEditor() {
        }
     }, [qid])
 
+     
+    const buildPayload = (): EditQuiz => ({
+    quizId: qid ?? null,
+    quizDetails: details,
+    questions: {
+        quizId: qid ?? null,
+        deleteQuestionsIds: Array.from(deletedIds),
+        updatedQuestions: questions.filter((q: QuestionDetails) =>
+        updatedIds.has(q.questionId!)
+        ),
+        newQuestions: questions.filter((q: QuestionDetails) =>
+        newIds.has(q.questionId!)
+        ),
+    }
+    });
+
     return (
         loaded && (
             <div>
@@ -185,8 +208,8 @@ export default function QuizEditor() {
                 <Button onClick={()=> {saveHandler(editQuiz, cid as string)}}> Edit Quiz</Button>
 
                 <div className="container-fluid">
-                    {selectedTab === "Details" && <QuizDetailsEditor details={details}/>}
-                    {selectedTab === "Questions" && <QuizQuestions questionsList={questions}/>}
+                    {selectedTab === "Details"  && <QuizDetailsEditor details={details}/>}
+                {selectedTab === "Questions" && <QuizQuestions />}
                 </div>
             </div>
         )

@@ -1,5 +1,5 @@
 export default interface QuestionDetails {
-    questionId: string,
+     questionId?: string; 
     questionTitle: string,
     questionDescription: string,
     questionType: string,

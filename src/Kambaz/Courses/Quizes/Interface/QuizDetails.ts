@@ -1,4 +1,4 @@
-import type {QuestionDetails} from "./QuestionDetails.ts";
+import type QuestionDetails from "./QuestionDetails.ts";
 
 export default interface QuizDetails {
     courseId: string,

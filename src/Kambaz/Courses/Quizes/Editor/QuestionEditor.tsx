@@ -5,11 +5,14 @@ import {FaRegKeyboard} from "react-icons/fa";
 import {Button} from "react-bootstrap";
 import {useDispatch} from "react-redux";
 
+import { addQuestion, updateQuestion } from "./reducer";
+
 interface Props {
     question: QuestionDetails | null;
+    onSave: () => void;
 }
 
-export default function QuestionEditor({ question }: Props) {
+export default function QuestionEditor({ question, onSave }: Props) {
     const [questionType, setQuestionType] = useState('multi-select');
     const [points, setPoints] = useState(4);
     const [questionText, setQuestionText] = useState('');
@@ -141,8 +144,9 @@ export default function QuestionEditor({ question }: Props) {
                     <ReactQuill
                         theme="snow"
                         value={questionText}
-                        onChange={() => {
-                            console.log("handle editor changes")
+                             onChange={(value) => {
+                               setQuestionText(value)
+                               setWordCount(value.split(/\s+/).length)
                         }}
                         style={{height: '200px'}}
                         modules={{
@@ -269,11 +273,40 @@ export default function QuestionEditor({ question }: Props) {
             </div>
             <hr/>
             <div className="d-flex justify-content-start">
-                <Button variant="secondary" className="me-2" >
+                  <Button
+                    variant="secondary"
+                    className="me-2"
+                   onClick={() => onSave()}
+                  >
                     Cancel
-                </Button>
-                <Button variant="danger" >
-                    Save
+                 </Button>
+                <Button
+                variant="danger"
+                onClick={() => {
+                     console.log("✅ Save clicked", { question, questionText });
+
+                    const payload: QuestionDetails = {
+                    questionId: question?.questionId,       
+                    questionTitle: questionText,
+                    questionDescription: questionText,
+                    questionType,
+                    possibleAnswers: answers,
+                    correctAnswers: correctAnswer,
+                    points
+                    };
+
+                    if (question && question.questionId) {
+
+                    dispatch(updateQuestion(payload));
+                    } else {
+
+                    dispatch(addQuestion(payload));
+                    }
+                    onSave();
+
+                }}
+                >
+                Save
                 </Button>
             </div>
         </div>
