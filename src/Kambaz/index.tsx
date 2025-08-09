@@ -10,7 +10,6 @@ import ProtectedRoute from "./Account/ProtectedRoute.tsx";
 import Session from "./Account/session.tsx";
 import * as userClient from "./Account/client";
 import * as courseClient from "./Courses/client"
-import * as enrollmentClient from "./enrollmentClient.ts";
 import {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 
@@ -26,7 +25,7 @@ export default function Kambaz() {
 
     const fetchCourses = async () => {
         try {
-            const courses = await userClient.findMyCourses();
+            const courses = await userClient.findCoursesForUser(currentUser._id)  ;
             setCourses(courses);
         } catch (error) {
             console.error(error);
@@ -48,7 +47,7 @@ export default function Kambaz() {
     }, [currentUser]);
 
     const addNewCourse = async () => {
-        const newCourse = await userClient.createCourse(course);
+        const newCourse = await courseClient.createCourse(course);
         setCourses([ ...courses, newCourse ]);
         setAllCourses([...allCourses, newCourse]);
         setCourse(defaultCourse);
@@ -62,7 +61,6 @@ export default function Kambaz() {
 
 
     const updateCourse = async () => {
-        console.log(course);
         await courseClient.updateCourse(course);
         setCourses(courses.map((c) => {
             if (c._id === course._id) { return course; }
@@ -76,14 +74,14 @@ export default function Kambaz() {
 
 
     const enroll = async(courseId: string) => {
-        await enrollmentClient.enrollInCourse({userId: currentUser._id, courseId: courseId});
+        await userClient.enrollIntoCourse(currentUser._id, courseId);
         const course = allCourses.find((course: any) => course._id === courseId);
         setCourses([...courses, course])
     }
 
 
     const unEnroll = async(courseId: string) => {
-        await enrollmentClient.unEnrollInCourse({userId: currentUser._id, courseId: courseId});
+        await userClient.unenrollFromCourse(currentUser._id, courseId);
         setCourses(courses.filter((course) => course._id !== courseId));
     }
 

@@ -36,7 +36,6 @@ export default function Assignments() {
                     minute: '2-digit',
                     hour12: true
                 }).toLowerCase();
-
         return `${month} ${day} at ${time}`;
     };
     const fetchAssignments = async () => {

@@ -1,5 +1,5 @@
 import { MdBlock } from "react-icons/md";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {IoEllipsisVertical} from "react-icons/io5";
 import Nav from "react-bootstrap/Nav";
 import QuizDetailsEditor from "./QuizDetailsEditor.tsx";
@@ -8,126 +8,29 @@ import * as quizClient from "../client.ts";
 import {useParams} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
-import {setDetails, setQuestions} from "./reducer.ts";
-import { fetchDetails, createNew } from "../client";
-import type EditQuiz from "../Interface/EditQuiz";
+import { clearData, setDetails, setPoints, setQuestions} from "./reducer.ts";
 
-import type QuestionDetails from "../Interface/QuestionDetails";
 export default function QuizEditor() {
-    const [points, setPoints] = useState(0);
     const [quizSate, setQuizSate] = useState('Not Published');
     const [selectedTab, setSelectedTab] = useState('Details');
     const [loaded, setLoaded] = useState(false);
     const { cid, qid } = useParams<{ cid: string,qid: string }>();
 
     const handleTabClick = (tabName: string) => {
-        setSelectedTab(tabName);
+        if (selectedTab === 'Details' && detailsEditorRef.current) {
+            const data = detailsEditorRef.current.saveCurrentState()
+            dispatch(setDetails(data))
+        }
+        setSelectedTab(tabName)
     };
-
     const details    = useSelector((state: any) => state.editorReducer.details);
-const questions  = useSelector((state: any) => state.editorReducer.questions);
-const newIds     = useSelector((state: any) => state.editorReducer.newQuestionIds)    as Set<string>;
-const updatedIds = useSelector((state: any) => state.editorReducer.updatedQuestionIds) as Set<string>;
-const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestionIds)  as Set<string>;
-    const newQuiz = {
-        quizId: null,
-        quizDetails: {
-            title: "New Quiz",
-            description : "New Description",
-            dates:{
-                availableFrom: new Date().toDateString(),
-                availableUntil: new Date().toDateString(),
-                dueDate: new Date().toDateString()
-            },
-            multipleAttempts: true,
-            numberOfAttempts: 3
-        },
-        questions: {
-            deleteQuestionsIds: null,
-            updatedQuestions: null,
-            newQuestions: [
-                {
-                    questionId: "mc_001",
-                    questionTitle: "Photosynthesis Process",
-                    questionDescription: "Which of the following best describes the process by which plants convert sunlight into energy?",
-                    questionType: "multi-select",
-                    possibleAnswers: [
-                        "To produce oxygen for animals",
-                        "To convert sunlight into chemical energy",
-                        "To absorb carbon dioxide from air",
-                        "To create chlorophyll"
-                    ],
-                    correctAnswers: "To convert sunlight into chemical energy",
-                    points: 2
-                },
-                {
-                    questionId: "tf_001",
-                    questionTitle: "JavaScript Variable Declaration",
-                    questionDescription: "True or False: In JavaScript, variables declared with 'const' can be reassigned after declaration.",
-                    questionType: "true-false",
-                    possibleAnswers: [
-                        "True",
-                        "False"
-                    ],
-                    correctAnswers: "False",
-                    points: 1
-                }
-            ]
-        }
-    }
+    const questions  = useSelector((state: any) => state.editorReducer.questions);
+    const newIds     = useSelector((state: any) => state.editorReducer.newQuestionIds)    as Set<string>;
+    const updatedIds = useSelector((state: any) => state.editorReducer.updatedQuestionIds) as Set<string>;
+    const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestionIds)  as Set<string>;
+    const points     = useSelector((state: any)=> state.editorReducer.points);
+    const detailsEditorRef = useRef<{ saveCurrentState: () => any }>(null);
 
-    const editQuiz = {
-        quizId: "q1-html",
-        quizDetails: {
-            title: "Q1 - HTML",
-            description : "New Description",
-            dates:{
-                availableFrom: new Date().toDateString(),
-                availableUntil: new Date().toDateString(),
-                dueDate: new Date().toDateString()
-            },
-            multipleAttempts: true,
-            numberOfAttempts: 3
-        },
-        questions: {
-            deleteQuestionsIds: ["mc_001"],
-            updatedQuestions: [
-                {
-                    questionId: "tf_001",
-                    questionTitle: "JavaScript Variable Declaration",
-                    questionDescription: "True or False: In JavaScript, variables declared with 'const' can be reassigned after declaration.",
-                    questionType: "multi-select",
-                    possibleAnswers: [
-                        "To produce oxygen for animals",
-                        "To convert sunlight into chemical energy",
-                        "To absorb carbon dioxide from air",
-                        "To create chlorophyll"
-                    ],
-                    correctAnswers: "To convert sunlight into chemical energy",
-                    points: 1
-                }
-            ],
-            newQuestions: [
-                {
-                    questionId: "tf_002",
-                    questionTitle: "JavaScript Variable Declaration",
-                    questionDescription: "True or False: In JavaScript, variables declared with 'const' can be reassigned after declaration.",
-                    questionType: "true-false",
-                    possibleAnswers: [
-                        "True",
-                        "False"
-                    ],
-                    correctAnswers: "False",
-                    points: 1
-                }
-            ]
-        }
-    }
-
-    const saveHandler = async(quiz: any, cid: string) => {
-        const response = await quizClient.createNew(quiz, cid);
-        console.log(response);
-    }
 
     const dispatch = useDispatch();
 
@@ -135,33 +38,37 @@ const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestio
         const quizDetails = await quizClient.fetchDetails(quizId);
         dispatch(setDetails(quizDetails.details))
         dispatch(setQuestions(quizDetails.questions));
-        setPoints(quizDetails.details.points)
+        dispatch(setPoints(quizDetails.points))
         setLoaded(true);
     }
     useEffect(() => {
-       if (qid === null || qid === undefined) {
-
+       dispatch(clearData())
+        if (qid === null || qid === undefined) {
+           setLoaded(true);
        }
        else {
            fetchDetails(qid);
        }
     }, [qid])
 
-     
-    const buildPayload = (): EditQuiz => ({
-    quizId: qid ?? null,
-    quizDetails: details,
-    questions: {
-        quizId: qid ?? null,
-        deleteQuestionsIds: Array.from(deletedIds),
-        updatedQuestions: questions.filter((q: QuestionDetails) =>
-        updatedIds.has(q.questionId!)
-        ),
-        newQuestions: questions.filter((q: QuestionDetails) =>
-        newIds.has(q.questionId!)
-        ),
+    const saveQuiz = async  ()=>{
+        const newIdsSet = new Set(newIds);
+        const updatedIdsSet = new Set(updatedIds);
+        // @ts-ignore
+        const data = detailsEditorRef.current.saveCurrentState()
+        dispatch(setDetails(data))
+        const requestBody = {
+            quizId: qid || null,
+            quizDetails: data,
+            questions: {
+                quizId: qid || null,
+                deleteQuestionsIds: deletedIds,
+                updatedQuestions: questions.filter((q: { questionId: string; }) => updatedIdsSet.has(q.questionId)),
+                newQuestions: questions.filter((q: { questionId: string; }) => newIdsSet.has(q.questionId)),
+            }
+        };
+        await quizClient.createNew(requestBody, cid as string);
     }
-    });
 
     return (
         loaded && (
@@ -169,7 +76,7 @@ const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestio
                 <div className="container-fluid p-3">
                     <div className="d-flex justify-content-end align-items-center">
                         <div className="d-flex align-items-center">
-                            <span className="me-4 fw-bold">Points {points}</span>
+                            <span className="me-4 fw-bold">Points : {points}</span>
                             <span className="me-4 text-muted">
                         <MdBlock/> {quizSate}
                     </span>
@@ -204,12 +111,20 @@ const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestio
                         </Nav.Item>
                     </Nav>
                 </div>
-                <Button onClick={()=> {saveHandler(newQuiz, cid as string)}}> Save New Quiz</Button>
-                <Button onClick={()=> {saveHandler(editQuiz, cid as string)}}> Edit Quiz</Button>
-
                 <div className="container-fluid">
-                    {selectedTab === "Details"  && <QuizDetailsEditor details={details}/>}
-                {selectedTab === "Questions" && <QuizQuestions />}
+                    {selectedTab === "Details" && <QuizDetailsEditor details={details} ref={detailsEditorRef}/>}
+                    {selectedTab === "Questions" && <QuizQuestions/>}
+                </div>
+                <div className="container-fluid p-3">
+                    <hr/>
+                    <div className="d-flex justify-content-end">
+                        <Button variant="secondary" className="me-2">
+                            Cancel
+                        </Button>
+                        <Button variant="danger" onClick={()=> saveQuiz()}>
+                            Save Quiz
+                        </Button>
+                    </div>
                 </div>
             </div>
         )

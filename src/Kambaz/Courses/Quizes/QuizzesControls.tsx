@@ -2,18 +2,18 @@
 
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { FaPlus, FaSearch } from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
 
 interface QuizzesControlsProps {
   searchTerm: string;
   onSearchChange: (v: string) => void;
-  onAddQuiz: () => void;
 }
 
 export default function QuizzesControls({
   searchTerm,
-  onSearchChange,
-  onAddQuiz
+  onSearchChange
 }: QuizzesControlsProps) {
+  const navigate = useNavigate();
   return (
     <div className="d-flex justify-content-between align-items-center mb-3">
       <InputGroup className="w-50 mt-5 ms-1">
@@ -27,7 +27,7 @@ export default function QuizzesControls({
         />
       </InputGroup>
       <div className="mt-5 me-1">
-        <Button variant="danger" onClick={onAddQuiz}>
+        <Button variant="danger" onClick={()=> navigate('create')}>
           <FaPlus className="me-1" />
           Quiz
         </Button>

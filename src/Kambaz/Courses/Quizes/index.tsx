@@ -47,7 +47,6 @@ export default function Quizzes() {
       <QuizzesControls
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        onAddQuiz={() => {}}
       />
       <br /><br /><br /><br />
 

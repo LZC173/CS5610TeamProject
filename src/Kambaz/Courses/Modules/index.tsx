@@ -73,7 +73,6 @@ export default function Modules() {
                                                  }}
                                                  defaultValue={module.name} />
                                 )}
-                                {isFaculty ? "facult" : "not faculty"}
                                 {isFaculty && (
                                     <ModuleControlButtons moduleId={module._id}
                                                           deleteModule={(moduleId) => removeModule(moduleId)}

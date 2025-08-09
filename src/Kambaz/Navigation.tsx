@@ -1,6 +1,6 @@
 import { AiOutlineDashboard } from "react-icons/ai";
 import { IoCalendarOutline } from "react-icons/io5";
-import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
+import { LiaBookSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 import { ListGroup } from "react-bootstrap";
@@ -9,7 +9,8 @@ export default function KambazNavigation() {
     const links = [
         { label: "Dashboard", path: "/Kambaz/Dashboard", icon: AiOutlineDashboard },
         { label: "Courses",   path: "/Kambaz/Dashboard", icon: LiaBookSolid },
-        { label: "Calendar",  path: "/Kambaz/Calendar",  icon: IoCalendarOutline }
+        { label: "Calendar",  path: "/Kambaz/Calendar",  icon: IoCalendarOutline },
+        { label: "Inbox",     path: "/Kambaz/Inbox",     icon: FaInbox }
     ];
     return (
         <ListGroup id="wd-kambaz-navigation" style={{width: 120}}
@@ -24,7 +25,7 @@ export default function KambazNavigation() {
                 Account
             </ListGroup.Item>
             {links.map((link) => (
-                <ListGroup.Item key={link.path} as={Link} to={link.path} className={`bg-black text-center border-0
+                <ListGroup.Item key={`${link.path}-${link.label}`} as={Link} to={link.path} className={`bg-black text-center border-0
               ${pathname.includes(link.label) ? "text-danger bg-white" : "text-white bg-black"}`}>
                     {link.icon({ className: "fs-1 text-danger"})}
                     <br />

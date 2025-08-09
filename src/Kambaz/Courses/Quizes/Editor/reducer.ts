@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
-
 const initialState = {
     details: {
         dates: {
@@ -9,15 +8,14 @@ const initialState = {
             availableUntil: new Date().toDateString(),
             dueDate: new Date().toDateString()
         },
-        points: 0,
-        noOfQuestions: 0,
         description: "",
         title: ""
     },
     questions: [],
-    updatedQuestionIds: new Set<string>(),
-    deleteQuestionIds: new Set<string>(),
-    newQuestionIds: new Set<string>()
+    updatedQuestionIds: [] as string[],
+    deleteQuestionIds: [] as string[],
+    newQuestionIds: [] as string[],
+    points: 0
 }
 
 const editorSlices = createSlice({
@@ -37,35 +35,49 @@ const editorSlices = createSlice({
             }
             // @ts-ignore
             state.questions = [...state.questions, newQuestion]
-            // @ts-ignore
-            state.newQuestionIds = new Set([...state.newQuestionIds, newQuestion.questionId])
+            state.newQuestionIds = [...state.newQuestionIds, newQuestion.questionId];
         },
-        deleteQuestion:(state, action) => {
-            // @ts-ignore
-            state.questions = state.questions.filter((q)=> q.questionId !== action.payload);
-            if(state.newQuestionIds.has(action.payload)) {
-                const newSet = new Set(state.newQuestionIds);
-                newSet.delete(action.payload);
-                state.newQuestionIds = newSet;
-            }
-            else {
-                if(state.updatedQuestionIds.has(action.payload)) {
-                    const newSet = new Set(state.updatedQuestionIds);
-                    newSet.delete(action.payload);
-                    state.updatedQuestionIds = newSet;
+        deleteQuestion: (state, action) => {
+            const questionId = action.payload as string;
+
+            state.questions = state.questions.filter((q: any) => q.questionId !== questionId);
+
+            if (state.newQuestionIds.includes(questionId)) {
+                state.newQuestionIds = state.newQuestionIds.filter(id => id !== questionId);
+            } else {
+                if (state.updatedQuestionIds.includes(questionId)) {
+                    state.updatedQuestionIds = state.updatedQuestionIds.filter(id => id !== questionId);
                 }
-                state.deleteQuestionIds = new Set([...state.deleteQuestionIds, action.payload])
+                if (!state.deleteQuestionIds.includes(questionId)) {
+                    state.deleteQuestionIds = [...state.deleteQuestionIds, questionId];
+                }
             }
         },
-        updateQuestion:(state, action) => {
+        updateQuestion: (state, action) => {
+            const updatedQuestion = action.payload;
+
             // @ts-ignore
-            state.questions = state.questions.map((q)=> q.questionId === action.payload.questionId ? action.payload : q);
-            if(!state.newQuestionIds.has(action.payload.questionId)){
-                state.updatedQuestionIds = new Set([...state.updatedQuestionIds, action.payload.questionId])
+            state.questions = state.questions.map((q: any) =>
+                q.questionId === action.payload.questionId ? action.payload : q
+            );
+
+            if (!state.newQuestionIds.includes(updatedQuestion.questionId)) {
+                if (!state.updatedQuestionIds.includes(updatedQuestion.questionId)) {
+                    state.updatedQuestionIds = [...state.updatedQuestionIds, updatedQuestion.questionId];
+                }
             }
+        },
+        clearData: (state) => {
+            Object.assign(state, initialState);
+        },
+        changePoints: (state, action) =>{
+            state.points = state.points + action.payload
+        },
+        setPoints:(state, action)=>{
+            state.points = action.payload
         }
     }
 })
 
-export const {setDetails, setQuestions, addQuestion, deleteQuestion, updateQuestion} = editorSlices.actions;
+export const {setDetails, setQuestions, addQuestion, deleteQuestion, updateQuestion, clearData, changePoints, setPoints} = editorSlices.actions;
 export default editorSlices.reducer;

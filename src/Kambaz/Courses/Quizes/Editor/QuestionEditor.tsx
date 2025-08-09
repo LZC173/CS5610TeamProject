@@ -5,7 +5,7 @@ import {FaRegKeyboard} from "react-icons/fa";
 import {Button} from "react-bootstrap";
 import {useDispatch} from "react-redux";
 
-import { addQuestion, updateQuestion } from "./reducer";
+import {addQuestion, changePoints, updateQuestion} from "./reducer";
 
 interface Props {
     question: QuestionDetails | null;
@@ -21,7 +21,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
     const [wordCount, setWordCount] = useState(0);
     const dispatch = useDispatch();
 
-    
+    const [initialPoints, setInitialPoints] = useState(0);
 
     useEffect(() => {
         if (question) {
@@ -31,7 +31,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
             setAnswers(question.possibleAnswers.length > 0 ? question.possibleAnswers : ['', '']);
             setCorrectAnswer(question.correctAnswers);
             setWordCount(question.questionDescription.length);
-            console.log(question.possibleAnswers)
+            setInitialPoints(question.points);
         } else {
             setQuestionType('multi-select');
             setPoints(4);
@@ -43,7 +43,6 @@ export default function QuestionEditor({ question, onSave }: Props) {
     }, [question]);
 
     const handleQuestionTypeChange = (type: string) => {
-        console.log("triggered")
         setQuestionType(type);
         setCorrectAnswer('');
 
@@ -112,7 +111,6 @@ export default function QuestionEditor({ question, onSave }: Props) {
                 </div>
             </div>
 
-            {/* Instructions */}
             <div className="row mb-3">
                 <div className="col-12">
                     <p className="text-muted small mb-3">
@@ -283,24 +281,23 @@ export default function QuestionEditor({ question, onSave }: Props) {
                 <Button
                 variant="danger"
                 onClick={() => {
-                     console.log("✅ Save clicked", { question, questionText });
-
                     const payload: QuestionDetails = {
                     questionId: question?.questionId,       
                     questionTitle: questionText,
                     questionDescription: questionText,
-                    questionType,
+                    questionType: questionType,
                     possibleAnswers: answers,
                     correctAnswers: correctAnswer,
-                    points
+                    points: points
                     };
 
                     if (question && question.questionId) {
 
                     dispatch(updateQuestion(payload));
+                    dispatch(changePoints(payload.points - initialPoints))
                     } else {
-
                     dispatch(addQuestion(payload));
+                    dispatch(changePoints(payload.points))
                     }
                     onSave();
 
