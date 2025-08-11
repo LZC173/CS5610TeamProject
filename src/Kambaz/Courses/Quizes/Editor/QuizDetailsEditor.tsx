@@ -30,9 +30,11 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
     const [quizType, setQuizType] = useState(details.quizType || 'GRADED_QUIZ');
     const [group, setGroup] = useState(details.group || 'ASSIGNMENTS');
     const [shuffleAnswers, setShuffleAnswers] = useState(details.options?.shuffleAnswers ?? false);
-    const [timeLimit, setTimeLimit] = useState(details.options?.timeLimit ?? false);
+    // const [timeLimit, setTimeLimit] = useState(details.options?.timeLimit ?? false);
     const [multiAttempt, setMultiAttempt] = useState(details.options?.multiAttempt ?? false);
     const [assignTo, setAssignTo] = useState(details.assignTo ?? 'Everyone');
+    const [attempts, setAttempts] = useState(details.options?.noOfAttempts ?? 1);
+    const [timeLimit, setTimeLimit] = useState(details.options?.timeLimit ?? 20);
 
     useEffect(() => {
         setContent(details.description || '');
@@ -62,7 +64,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                 },
                 quizType,
                 group,
-                options: {shuffleAnswers, timeLimit, multiAttempt},
+                options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts},
                 assignTo
             };
         }
@@ -173,14 +175,38 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                                     onChange={e => setShuffleAnswers(e.target.checked)}
                                     className="mb-2"
                                 />
-                                <Form.Check
-                                    type="checkbox"
-                                    id="wd-time-limit"
-                                    label="Time limit"
-                                    checked={timeLimit}
-                                    onChange={e => setTimeLimit(e.target.checked)}
-                                    className="mb-2"
-                                />
+                                <div className="mb-2">
+                                    <Form.Label htmlFor="wd-attempts" className="mb-1">No of Attempts</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        min="1"
+                                        id="wd-attempts"
+                                        value={attempts}
+                                        onChange={e => setAttempts(parseInt(e.target.value) || 1)}
+                                        placeholder="Enter number of attempts"
+                                    />
+
+                                </div>
+                                <div className="mb-2">
+                                    <Form.Label htmlFor="wd-time-limit" className="mb-1">Time limit</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        min="10"
+                                        id="wd-time-limit"
+                                        value={timeLimit}
+                                        onChange={e => setTimeLimit(parseInt(e.target.value) || 10)}
+                                        placeholder="Time Limit"
+                                    />
+
+                                </div>
+                                {/*<Form.Check*/}
+                                {/*    type="checkbox"*/}
+                                {/*    id="wd-time-limit"*/}
+                                {/*    label="Time limit"*/}
+                                {/*    checked={timeLimit}*/}
+                                {/*    onChange={e => setTimeLimit(e.target.checked)}*/}
+                                {/*    className="mb-2"*/}
+                                {/*/>*/}
                                 <Form.Check
                                     type="checkbox"
                                     id="wd-multi-attempt"
