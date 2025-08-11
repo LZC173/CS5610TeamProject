@@ -30,11 +30,12 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
     const [quizType, setQuizType] = useState(details.quizType || 'GRADED_QUIZ');
     const [group, setGroup] = useState(details.group || 'ASSIGNMENTS');
     const [shuffleAnswers, setShuffleAnswers] = useState(details.options?.shuffleAnswers ?? false);
-    // const [timeLimit, setTimeLimit] = useState(details.options?.timeLimit ?? false);
-    const [multiAttempt, setMultiAttempt] = useState(details.options?.multiAttempt ?? false);
     const [assignTo, setAssignTo] = useState(details.assignTo ?? 'Everyone');
     const [attempts, setAttempts] = useState(details.options?.noOfAttempts ?? 1);
     const [timeLimit, setTimeLimit] = useState(details.options?.timeLimit ?? 20);
+    const [accessCode, setAccessCode] = useState(details.options?.accessCode ?? "");
+    const [questionLock, setQuestionLock] = useState(details.options?.lockEnabled ?? false);
+    const [showAnswers, setShowAnswers] = useState(details.option?.showAnswers ?? null);
 
     useEffect(() => {
         setContent(details.description || '');
@@ -46,8 +47,10 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         setGroup(details.group || 'ASSIGNMENTS');
         setShuffleAnswers(details.options?.shuffleAnswers ?? false);
         setTimeLimit(details.options?.timeLimit ?? false);
-        setMultiAttempt(details.options?.multiAttempt ?? false);
         setAssignTo(details.assignTo ?? 'Everyone');
+        setAccessCode(details.options?.lockEnabled);
+        setQuestionLock(details.options?.lockEnabled);
+        setShowAnswers(details.options?.showAnswers);
     }, [details]);
 
     useImperativeHandle(ref, () => ({
@@ -64,7 +67,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                 },
                 quizType,
                 group,
-                options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts},
+                options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts, questionLock: questionLock, showAnswers: showAnswers},
                 assignTo
             };
         }
@@ -167,54 +170,81 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                     <Col sm={9}>
                         <Card className="border">
                             <Card.Body>
-                                <Form.Check
-                                    type="checkbox"
-                                    id="wd-shuffle"
-                                    label="Shuffle Answers"
-                                    checked={shuffleAnswers}
-                                    onChange={e => setShuffleAnswers(e.target.checked)}
-                                    className="mb-2"
-                                />
-                                <div className="mb-2">
-                                    <Form.Label htmlFor="wd-attempts" className="mb-1">No of Attempts</Form.Label>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label className="mb-0" style={{minWidth: '150px'}}>Shuffle
+                                        Answers</Form.Label>
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="wd-shuffle"
+                                        checked={shuffleAnswers}
+                                        onChange={e => setShuffleAnswers(e.target.checked)}
+                                        className="mb-0 ms-3"
+                                    />
+                                </div>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label className="mb-0" style={{minWidth: '150px'}}>Lock Questions</Form.Label>
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="wd-question-lock"
+                                        checked={questionLock}
+                                        onChange={e => setQuestionLock(e.target.checked)}
+                                        className="mb-0 ms-3"
+                                    />
+                                </div>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label htmlFor="wd-attempts" className="mb-0" style={{minWidth: '150px'}}>No of
+                                        Attempts</Form.Label>
                                     <Form.Control
                                         type="number"
                                         min="1"
                                         id="wd-attempts"
                                         value={attempts}
                                         onChange={e => setAttempts(parseInt(e.target.value) || 1)}
-                                        placeholder="Enter number of attempts"
+                                        placeholder="1"
+                                        style={{width: '80px'}}
+                                        className="ms-3"
                                     />
-
                                 </div>
-                                <div className="mb-2">
-                                    <Form.Label htmlFor="wd-time-limit" className="mb-1">Time limit</Form.Label>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label htmlFor="wd-time-limit" className="mb-0" style={{minWidth: '150px'}}>Time
+                                        limit (minutes)</Form.Label>
                                     <Form.Control
                                         type="number"
                                         min="10"
                                         id="wd-time-limit"
                                         value={timeLimit}
                                         onChange={e => setTimeLimit(parseInt(e.target.value) || 10)}
-                                        placeholder="Time Limit"
+                                        placeholder="10"
+                                        style={{width: '80px'}}
+                                        className="ms-3"
                                     />
-
                                 </div>
-                                {/*<Form.Check*/}
-                                {/*    type="checkbox"*/}
-                                {/*    id="wd-time-limit"*/}
-                                {/*    label="Time limit"*/}
-                                {/*    checked={timeLimit}*/}
-                                {/*    onChange={e => setTimeLimit(e.target.checked)}*/}
-                                {/*    className="mb-2"*/}
-                                {/*/>*/}
-                                <Form.Check
-                                    type="checkbox"
-                                    id="wd-multi-attempt"
-                                    label="Allow Multiple Attempts"
-                                    checked={multiAttempt}
-                                    onChange={e => setMultiAttempt(e.target.checked)}
-                                    className="mb-2"
-                                />
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label htmlFor="wd-access-code" className="mb-0" style={{minWidth: '150px'}}>Access
+                                        Code</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        id="wd-access-code"
+                                        value={accessCode}
+                                        onChange={e => setAccessCode(e.target.value)}
+                                        placeholder="Enter access code"
+                                        style={{width: '200px'}}
+                                        className="ms-3"
+                                    />
+                                </div>
+                                <div className="mb-2 d-flex align-items-center">
+                                        <Form.Label htmlFor="wd-showAnswers" className="mb-0" style={{minWidth: '150px'}}>
+                                            Show Answers
+                                        </Form.Label>
+                                        <Form.Control
+                                            id="wd-available-until"
+                                            type="datetime-local"
+                                            value={showAnswers}
+                                            style={{width: '200px'}}
+                                            className="ms-3"
+                                            onChange={e => setShowAnswers(e.target.value)}
+                                        />
+                                </div>
                             </Card.Body>
                         </Card>
                     </Col>

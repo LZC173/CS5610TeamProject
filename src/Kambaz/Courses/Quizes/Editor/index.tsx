@@ -9,9 +9,10 @@ import {useParams} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
 import { clearData, setDetails, setPoints, setQuestions} from "./reducer.ts";
+import {FaCheckCircle} from "react-icons/fa";
 
 export default function QuizEditor() {
-    const [quizSate, setQuizSate] = useState('Not Published');
+    const [quizSate, setQuizSate] = useState(false);
     const [selectedTab, setSelectedTab] = useState('Details');
     const [loaded, setLoaded] = useState(false);
     const { cid, qid } = useParams<{ cid: string,qid: string }>();
@@ -36,6 +37,7 @@ export default function QuizEditor() {
 
     const fetchDetails = async (quizId : string) => {
         const quizDetails = await quizClient.fetchDetails(quizId);
+        setQuizSate(quizDetails.published);
         dispatch(setDetails(quizDetails.details))
         dispatch(setQuestions(quizDetails.questions));
         dispatch(setPoints(quizDetails.points))
@@ -51,7 +53,7 @@ export default function QuizEditor() {
        }
     }, [qid])
 
-    const saveQuiz = async  ()=>{
+    const saveQuiz = async  (status: boolean)=>{
         const newIdsSet = new Set(newIds);
         const updatedIdsSet = new Set(updatedIds);
         // @ts-ignore
@@ -59,6 +61,7 @@ export default function QuizEditor() {
         dispatch(setDetails(data))
         const requestBody = {
             quizId: qid || null,
+            published: status,
             quizDetails: data,
             questions: {
                 quizId: qid || null,
@@ -78,7 +81,13 @@ export default function QuizEditor() {
                         <div className="d-flex align-items-center">
                             <span className="me-4 fw-bold">Points : {points}</span>
                             <span className="me-4 text-muted">
-                        <MdBlock/> {quizSate}
+                                {quizSate ? <>
+                                    <FaCheckCircle className="text-success me-2" />
+                                    <span>Published</span>
+                                </> : <>
+                                    <MdBlock/>
+                                    <span> Not Published</span>
+                                </>}
                     </span>
                             <button className="btn btn-light border rounded p-1">
                                 <IoEllipsisVertical id="wd-assignemnt-controls" className="fs-5"/>
@@ -121,8 +130,11 @@ export default function QuizEditor() {
                         <Button variant="secondary" className="me-2">
                             Cancel
                         </Button>
-                        <Button variant="danger" onClick={()=> saveQuiz()}>
-                            Save Quiz
+                        <Button variant="danger" className="me-2" onClick={()=> saveQuiz(quizSate)}>
+                            Save
+                        </Button>
+                        <Button variant="primary" onClick={()=>{setQuizSate(true); saveQuiz(true)}}>
+                            Save and Publish
                         </Button>
                     </div>
                 </div>
