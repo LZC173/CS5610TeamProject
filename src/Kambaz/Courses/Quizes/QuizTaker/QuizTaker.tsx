@@ -20,6 +20,7 @@ export default function QuizTaker() {
 
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [timerStarted, setTimerStarted] = useState(false);
+ const [attemptScore, setAttemptScore] = useState(null);
 
   useEffect(() => {
     if (!timerStarted || timeLeft <= 0) return;
@@ -138,10 +139,10 @@ const onSubmit = async () => {
     }
 
     //submit to backend 
-    await quizClient.submitAttempt(qid, out);
-
+    const response = await quizClient.submitAttempt(qid, out);
+    setAttemptScore(response)
     alert("submitted");
-    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+    // navigate(`/Kambaz/Courses/${cid}/Quizzes`);
   } catch (e) {
     console.error(e);
     alert("submit fail !!!");
@@ -185,6 +186,9 @@ const onSubmit = async () => {
               </div>
             </div>
 
+            {attemptScore &&
+                <h4>Your score : {attemptScore?.score} out of {attemptScore?.points}</h4>
+            }
 
             {details?.description && (
                 <div className="description_editor mb-4">
