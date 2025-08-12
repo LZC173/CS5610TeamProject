@@ -29,3 +29,30 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
 .wd-lesson {
     border-left: 3px solid green !important;
 }
+
+
+
+.quiz-meta {
+  font-size: 0.925rem;
+  color: #6c757d;
+}
+
+.quiz-card .card-header {
+  background-color: #f6f7f8;
+}
+
+.question-badge {
+  background: #e9ecef;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding: 12px 0;
+}

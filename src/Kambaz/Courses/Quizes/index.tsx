@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import { ListGroup } from "react-bootstrap";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom"; 
 import { useSelector, useDispatch } from "react-redux";
 import { GoRocket } from "react-icons/go";
 import { FaCaretDown, FaTrash } from "react-icons/fa";
@@ -16,7 +16,7 @@ export default function Quizzes() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const canEdit = currentUser.role === "FACULTY";
-
+    const navigate = useNavigate(); 
   const { cid } = useParams<{ cid: string }>();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -41,6 +41,46 @@ export default function Quizzes() {
   useEffect(() => {
     fetchQuizzes(cid as string);
   }, []);
+
+
+
+  //
+    //handle quiz 
+const handleEnterQuiz = async (quizId: string) => {
+  // 1) eget access code 
+  const detail = await quizzesClient.fetchDetails(quizId);
+  const allowedAttempts: number = detail?.details?.options?.noOfAttempts ?? 1;
+
+  //
+  const accessCode: string | null = detail?.details?.options?.accessCode ?? null;
+  const requireAccess = !!accessCode;
+
+  // 2)get attept 
+  const attempt = await quizzesClient.getAttemptDetails(quizId);
+  const usedAttempts: number = attempt?.noOfAttempts ?? 0;
+
+  // 
+  if (usedAttempts >= allowedAttempts) {
+    navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/result`);
+    return;
+  }
+  if (requireAccess) {
+    const real = String(accessCode);
+
+  while (true) {
+    const input = window.prompt("Please enter access code:");
+    if (input === null) return;                 
+    if (input.trim() === real) {
+      sessionStorage.setItem(`quiz:${quizId}:accessGranted`, "true");
+      break;                                    
+    }
+    alert("Access code incorrect. Try again or click Cancel.");
+  }
+  }
+
+  navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`);
+};
+
 
   return (
     <div>
@@ -82,14 +122,26 @@ export default function Quizzes() {
                   <div className="d-flex align-items-start">
                     <GoRocket className="me-2 fs-3 mt-4 text-success bg-white rounded-circle" />
 
-                    <div className="ms-2 flex-grow-1">
+                  <div className="ms-2 flex-grow-1">
                       <div className="fw-bold">
-                        <Link
-                          to={`/Kambaz/Courses/${cid}/Quizzes/${q.quizId}`}
-                          className="text-decoration-none text-dark"
-                        >
-                          {q.title}
-                        </Link>
+                        {canEdit ? (
+                          // faculty go to editor 
+                          <Link
+                            to={`/Kambaz/Courses/${cid}/Quizzes/${q.quizId}`}
+                            className="text-decoration-none text-dark"
+                          >
+                            {q.title}
+                          </Link>
+                        ) : (
+                          // student handle enter quiz then go to result or quiz taker 
+                          <button
+                            type="button"
+                            onClick={() => handleEnterQuiz(q.quizId)}
+                            className="btn btn-link text-decoration-none text-dark p-0"
+                          >
+                            {q.title}
+                          </button>
+                        )}
                       </div>
                       <div className="text-secondary">
                         {status === "closed" && (

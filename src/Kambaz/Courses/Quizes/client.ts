@@ -22,3 +22,23 @@ export const updateStatus = async (quizId: string, status: boolean ) => {
     const response = await axios.put(`${REMOTE_SERVER}/api/updateStatus`, { quizId: quizId, status: status});
     return response.data
 }
+
+
+export type AttemptAnswers = Record<string, string>; // using string to string json file which is similar to
+//map in backend 
+
+export const getAttemptDetails = async (quizId: string) => {
+  const { data } = await axiosWithCredentials.get(
+    `${REMOTE_SERVER}/api/attemptDetails/${quizId}`
+  );
+  return data; // 
+};
+
+// submit attempt
+export const submitAttempt = async (quizId: string, answers: AttemptAnswers) => {
+  const { data } = await axiosWithCredentials.put(
+    `${REMOTE_SERVER}/api/newAttempt/${quizId}`,
+    answers
+  );
+  return data;
+};

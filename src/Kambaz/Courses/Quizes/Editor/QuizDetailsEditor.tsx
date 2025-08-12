@@ -33,7 +33,8 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
     const [assignTo, setAssignTo] = useState(details.assignTo ?? 'Everyone');
     const [attempts, setAttempts] = useState(details.options?.noOfAttempts ?? 1);
     const [timeLimit, setTimeLimit] = useState(details.options?.timeLimit ?? 20);
-    const [accessCode, setAccessCode] = useState(details.options?.accessCode ?? "");
+    const [accessCode, setAccessCode] =
+  useState(details.options?.accessCode ?? "");
     const [questionLock, setQuestionLock] = useState(details.options?.lockEnabled ?? false);
     const [showAnswers, setShowAnswers] = useState(details.option?.showAnswers ?? null);
 
@@ -48,7 +49,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         setShuffleAnswers(details.options?.shuffleAnswers ?? false);
         setTimeLimit(details.options?.timeLimit ?? false);
         setAssignTo(details.assignTo ?? 'Everyone');
-        setAccessCode(details.options?.lockEnabled);
+        setAccessCode(details.options?.accessCode ?? "");
         setQuestionLock(details.options?.lockEnabled);
         setShowAnswers(details.options?.showAnswers);
     }, [details]);
@@ -67,7 +68,9 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                 },
                 quizType,
                 group,
-                options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts, questionLock: questionLock, showAnswers: showAnswers},
+                options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts, questionLock: questionLock, showAnswers: showAnswers,
+                      accessCode : accessCode,  
+                },
                 assignTo
             };
         }
