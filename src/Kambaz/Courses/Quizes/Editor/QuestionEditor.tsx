@@ -19,6 +19,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
     const [answers, setAnswers] = useState(['', '']);
     const [correctAnswer, setCorrectAnswer] = useState('');
     const [wordCount, setWordCount] = useState(0);
+    const [title, setTitle] = useState("");
     const dispatch = useDispatch();
 
     const [initialPoints, setInitialPoints] = useState(0);
@@ -27,6 +28,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
         if (question) {
             setQuestionType(question.questionType);
             setPoints(question.points);
+            setTitle(question.questionTitle)
             setQuestionText(question.questionDescription);
             setAnswers(question.possibleAnswers.length > 0 ? question.possibleAnswers : ['', '']);
             setCorrectAnswer(question.correctAnswers);
@@ -65,7 +67,6 @@ export default function QuestionEditor({ question, onSave }: Props) {
         if (questionType === 'multi-select' && answers.length > 2) {
             const newAnswers = answers.filter((_, i) => i !== index);
             setAnswers(newAnswers);
-            // Clear correct answer if it was the removed option
             if (correctAnswer === answers[index]) {
                 setCorrectAnswer('');
             }
@@ -115,6 +116,13 @@ export default function QuestionEditor({ question, onSave }: Props) {
                 <div className="col-12">
                     <p className="text-muted small mb-3">
                         Enter your question and multiple answers, then select the one correct answer.
+                        <input
+                            type="text"
+                            className="form-control me-2"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Enter question title here"
+                        />
                     </p>
                 </div>
             </div>
@@ -124,7 +132,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
                 <div className="border rounded-top bg-light px-3 py-2">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <div className="d-flex gap-3">
-                            <button className="btn btn-link p-0 text-black text-decoration-none small">Edit</button>
+                        <button className="btn btn-link p-0 text-black text-decoration-none small">Edit</button>
                             <button className="btn btn-link p-0 text-black text-decoration-none small">View</button>
                             <button className="btn btn-link p-0 text-black text-decoration-none small">Insert
                             </button>
@@ -283,7 +291,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
                 onClick={() => {
                     const payload: QuestionDetails = {
                     questionId: question?.questionId,       
-                    questionTitle: questionText,
+                    questionTitle: title,
                     questionDescription: questionText,
                     questionType: questionType,
                     possibleAnswers: answers,

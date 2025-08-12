@@ -51,9 +51,6 @@ const handleEnterQuiz = async (quizId: string) => {
   const detail = await quizzesClient.fetchDetails(quizId);
   const allowedAttempts: number = detail?.details?.options?.noOfAttempts ?? 1;
 
-  //
-  const accessCode: string | null = detail?.details?.options?.accessCode ?? null;
-  const requireAccess = !!accessCode;
 
   // 2)get attept 
   const attempt = await quizzesClient.getAttemptDetails(quizId);
@@ -64,20 +61,6 @@ const handleEnterQuiz = async (quizId: string) => {
     navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/result`);
     return;
   }
-  if (requireAccess) {
-    const real = String(accessCode);
-
-  while (true) {
-    const input = window.prompt("Please enter access code:");
-    if (input === null) return;                 
-    if (input.trim() === real) {
-      sessionStorage.setItem(`quiz:${quizId}:accessGranted`, "true");
-      break;                                    
-    }
-    alert("Access code incorrect. Try again or click Cancel.");
-  }
-  }
-
   navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`);
 };
 
