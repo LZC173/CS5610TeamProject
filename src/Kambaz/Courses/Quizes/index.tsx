@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import { ListGroup } from "react-bootstrap";
+import { ListGroup, Modal, Button } from "react-bootstrap";
 import { useParams, Link, useNavigate } from "react-router-dom"; 
 import { useSelector, useDispatch } from "react-redux";
 import { GoRocket } from "react-icons/go";
@@ -21,6 +21,13 @@ export default function Quizzes() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const {quizzes} = useSelector((state: any) => state.quizzesReducer) as QuizzesState;
+    const [choiceModal, setChoiceModal] = useState<{
+    show: boolean;
+    quizId: string | null;
+    allowed: number;
+    used: number;
+  }>({ show: false, quizId: null, allowed: 0, used: 0 });
+
 
   const filtered = quizzes
     .filter((q) => q.title.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -61,8 +68,32 @@ const handleEnterQuiz = async (quizId: string) => {
     navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/result`);
     return;
   }
-  navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`);
+  setChoiceModal({
+      show: true,
+      quizId,
+      allowed: allowedAttempts,
+      used: usedAttempts,
+    });
 };
+
+//got 
+  const goToResult = () => {
+    if (!choiceModal.quizId) return;
+    navigate(`/Kambaz/Courses/${cid}/Quizzes/${choiceModal.quizId}/result`);
+    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 });
+  };
+
+  const goToTake = () => {
+    if (!choiceModal.quizId) return;
+    navigate(`/Kambaz/Courses/${cid}/Quizzes/${choiceModal.quizId}/take`);
+    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 });
+  };
+
+  const closeModal = () => {
+    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 });
+  };
+
+
 
 
   return (
@@ -161,6 +192,29 @@ const handleEnterQuiz = async (quizId: string) => {
           </ListGroup>
         </ListGroup.Item>
       </ListGroup>
+
+
+
+      //modal here 
+                  <Modal show={choiceModal.show} onHide={closeModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Choose an action</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {`Attempts used: ${choiceModal.used} / ${choiceModal.allowed}.`}
+          <div className="mt-2">Do you want to view results or start a new attempt?</div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={goToResult}>
+            View Results
+          </Button>
+          <Button variant="primary" onClick={goToTake}>
+            Start Attempt
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
     </div>
   );
 }
