@@ -68,6 +68,10 @@ const handleEnterQuiz = async (quizId: string) => {
     navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/result`);
     return;
   }
+  if (usedAttempts < 1) {
+  navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`);
+  return;
+}
   setChoiceModal({
       show: true,
       quizId,
