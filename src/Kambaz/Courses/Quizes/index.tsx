@@ -56,10 +56,9 @@ export default function Quizzes() {
     //handle quiz 
 const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
 
-  console.log(availableUntil, now)
-
   // 1) eget access code
   const detail = await quizzesClient.fetchDetails(quizId);
+  console.log(detail)
   const allowedAttempts: number = detail?.details?.options?.noOfAttempts ?? 1;
 
 
@@ -79,7 +78,7 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
   setChoiceModal({
       show: true,
       quizId,
-      canStart: new Date(availableUntil) < now,
+      canStart: new Date(availableUntil) > now,
       allowed: allowedAttempts,
       used: usedAttempts,
     });

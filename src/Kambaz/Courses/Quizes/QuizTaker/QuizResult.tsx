@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Badge } from "react-bootstrap";
+import {Button, Badge, Alert} from "react-bootstrap";
 import * as quizClient from "../client.ts";
 import type QuestionDetails from "../Interface/QuestionDetails";
 
@@ -15,6 +15,20 @@ export default function QuizResult() {
   const [attempt, setAttempt] = useState<any>(null);
   const [questions, setQuestions] = useState<QuestionDetails[]>([]);
   const [answers, setAnswers] = useState<AnswersMap>({});
+
+
+  const showAnswersAlert = useMemo(() => {
+    if (!attempt?.quiz?.details?.options?.showAnswers) return null;
+
+    const showAnswersDate = new Date(attempt.quiz.details.options.showAnswers);
+    const now = new Date();
+
+    if (now < showAnswersDate) {
+      return showAnswersDate;
+    }
+
+    return null;
+  }, [attempt]);
 
   useEffect(() => {
     (async () => {
@@ -82,6 +96,14 @@ export default function QuizResult() {
         </div>
       </div>
 
+      {showAnswersAlert && (
+          <Alert variant="info" className="mb-4">
+            <strong>Answers will be available after:</strong>{" "}
+            {showAnswersAlert.toLocaleDateString()} at{" "}
+            {showAnswersAlert.toLocaleTimeString()}
+          </Alert>
+      )}
+
       <div className="border rounded p-3 mb-4 d-flex justify-content-between align-items-center">
         <div className="fs-5">
           Score: <strong>{attempt.score ?? 0}</strong> / {totalPoints}
@@ -111,9 +133,9 @@ export default function QuizResult() {
                       <span className="me-2">pts:</span>
                       <span className="fw-bold">{q.points}</span>
                     </span>
-                    <Badge bg={correct ? "success" : "danger"}>
+                    {q.correctAnswers && <Badge bg={correct ? "success" : "danger"}>
                       {correct ? "Correct" : "Incorrect"}
-                    </Badge>
+                    </Badge>}
                   </div>
                 </div>
 

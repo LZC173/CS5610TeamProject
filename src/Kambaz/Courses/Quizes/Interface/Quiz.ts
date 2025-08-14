@@ -1,4 +1,5 @@
 export default interface Quiz {
+    published: boolean;
     quizId: string;
     course: string;
     title: string;
