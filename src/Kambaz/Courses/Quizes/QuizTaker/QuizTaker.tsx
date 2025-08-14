@@ -142,12 +142,13 @@ const onSubmit = async () => {
     const response = await quizClient.submitAttempt(qid, out);
     setAttemptScore(response)
     alert("submitted");
-    // navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+    //navigate(`/Kambaz/Courses/${cid}/Quizzes`);
   } catch (e) {
     console.error(e);
     alert("submit fail !!!");
   } finally {
     setSubmitting(false);
+     navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/result`); 
   }
 };
   if (loading) return null;
