@@ -50,7 +50,11 @@ export default function Quizzes() {
     fetchQuizzes(cid as string);
   }, []);
 
-
+  const [expiredModal, setExpiredModal] = useState<{
+      show: boolean;
+      until: string;
+      now: string;
+    }>({ show: false, until: "", now: "" });
 
   //
     //handle quiz 
@@ -71,6 +75,16 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
     navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/result`);
     return;
   }
+
+  if (usedAttempts < 1 && new Date(availableUntil) < new Date()) {
+    setExpiredModal({
+      show: true,
+      until: new Date(availableUntil).toLocaleString(),
+      now: new Date().toLocaleString(),
+    });
+    return;
+  }
+
   if (usedAttempts < 1) {
   navigate(`/Kambaz/Courses/${cid}/Quizzes/${quizId}/take`);
   return;
@@ -202,24 +216,57 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
       </ListGroup>
 
 
-      <Modal show={choiceModal.show} onHide={closeModal} centered>
+        <Modal show={choiceModal.show} onHide={closeModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Choose an action</Modal.Title>
         </Modal.Header>
+
         <Modal.Body>
           {`Attempts used: ${choiceModal.used} / ${choiceModal.allowed}.`}
-          <div className="mt-2">Do you want to view results or start a new attempt?</div>
+          <div className="mt-2">
+            {choiceModal.canStart
+              ? "Do you want to view results or start a new attempt?"
+              : "The quiz window has closed. You can only view your past results."}
+          </div>
         </Modal.Body>
+
         <Modal.Footer>
           <Button variant="secondary" onClick={goToResult}>
             View Results
           </Button>
-          {choiceModal.canStart && <Button variant="primary" onClick={goToTake}>
-            Start Attempt
-          </Button>}
+          {choiceModal.canStart && (
+            <Button variant="primary" onClick={goToTake}>
+              Start Attempt
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
+      <Modal
+        show={expiredModal.show}
+        onHide={() => setExpiredModal({ show: false, until: "", now: "" })}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Quiz unavailable</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          You missed the allowed time window for this quiz.<br />
+          <div className="mt-2">
+            <div>Available until: <strong>{expiredModal.until}</strong></div>
+            <div>Current time: <strong>{expiredModal.now}</strong></div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setExpiredModal({ show: false, until: "", now: "" })}
+          >
+            Got it
+          </Button>
         </Modal.Footer>
       </Modal>
 
+                    
 
     </div>
   );
