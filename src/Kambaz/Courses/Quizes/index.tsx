@@ -16,17 +16,19 @@ export default function Quizzes() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const canEdit = currentUser.role === "FACULTY";
-    const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { cid } = useParams<{ cid: string }>();
   const [searchTerm, setSearchTerm] = useState("");
+  const now = new Date();
 
   const {quizzes} = useSelector((state: any) => state.quizzesReducer) as QuizzesState;
     const [choiceModal, setChoiceModal] = useState<{
     show: boolean;
     quizId: string | null;
+    canStart: boolean;
     allowed: number;
     used: number;
-  }>({ show: false, quizId: null, allowed: 0, used: 0 });
+  }>({ show: false, quizId: null, allowed: 0, used: 0, canStart: false });
 
 
   const filtered = quizzes
@@ -41,7 +43,6 @@ export default function Quizzes() {
 
   const fetchQuizzes = async (courseId: string) => {
     const quizzes = await quizzesClient.fetchQuizzes(courseId as string);
-    console.log(quizzes);
     dispatch(setQuizzes(quizzes))
   }
 
@@ -53,8 +54,11 @@ export default function Quizzes() {
 
   //
     //handle quiz 
-const handleEnterQuiz = async (quizId: string) => {
-  // 1) eget access code 
+const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
+
+  console.log(availableUntil, now)
+
+  // 1) eget access code
   const detail = await quizzesClient.fetchDetails(quizId);
   const allowedAttempts: number = detail?.details?.options?.noOfAttempts ?? 1;
 
@@ -75,6 +79,7 @@ const handleEnterQuiz = async (quizId: string) => {
   setChoiceModal({
       show: true,
       quizId,
+      canStart: new Date(availableUntil) < now,
       allowed: allowedAttempts,
       used: usedAttempts,
     });
@@ -84,17 +89,17 @@ const handleEnterQuiz = async (quizId: string) => {
   const goToResult = () => {
     if (!choiceModal.quizId) return;
     navigate(`/Kambaz/Courses/${cid}/Quizzes/${choiceModal.quizId}/result`);
-    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 });
+    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 , canStart: false});
   };
 
   const goToTake = () => {
     if (!choiceModal.quizId) return;
     navigate(`/Kambaz/Courses/${cid}/Quizzes/${choiceModal.quizId}/take`);
-    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 });
+    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 , canStart: false});
   };
 
   const closeModal = () => {
-    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0 });
+    setChoiceModal({ show: false, quizId: null, allowed: 0, used: 0, canStart: false });
   };
 
 
@@ -118,7 +123,6 @@ const handleEnterQuiz = async (quizId: string) => {
           <ListGroup className="wd-lessons rounded-0">
             {filtered.map((q) => {
 
-              const now = new Date();
               const availableFrom = new Date(q.dates.availableFrom);
               const availableUntil = new Date(q.dates.availableUntil);
               const dueDate = new Date(q.dates.dueDate);
@@ -133,7 +137,8 @@ const handleEnterQuiz = async (quizId: string) => {
               }
 
 
-              const published = now > availableFrom;
+              const published = q.published;
+              console.log(q)
 
               return (
                 <ListGroup.Item key={q.quizId} className="wd-lesson p-3 ps-1">
@@ -154,7 +159,7 @@ const handleEnterQuiz = async (quizId: string) => {
                           // student handle enter quiz then go to result or quiz taker 
                           <button
                             type="button"
-                            onClick={() => handleEnterQuiz(q.quizId)}
+                            onClick={() => handleEnterQuiz(q.dates.availableUntil, q.quizId)}
                             className="btn btn-link text-decoration-none text-dark p-0"
                           >
                             {q.title}
@@ -198,9 +203,7 @@ const handleEnterQuiz = async (quizId: string) => {
       </ListGroup>
 
 
-
-      //modal here 
-                  <Modal show={choiceModal.show} onHide={closeModal} centered>
+      <Modal show={choiceModal.show} onHide={closeModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Choose an action</Modal.Title>
         </Modal.Header>
@@ -212,9 +215,9 @@ const handleEnterQuiz = async (quizId: string) => {
           <Button variant="secondary" onClick={goToResult}>
             View Results
           </Button>
-          <Button variant="primary" onClick={goToTake}>
+          {choiceModal.canStart && <Button variant="primary" onClick={goToTake}>
             Start Attempt
-          </Button>
+          </Button>}
         </Modal.Footer>
       </Modal>
 
