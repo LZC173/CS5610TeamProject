@@ -250,28 +250,29 @@ const onSubmit = async () => {
                         <div className="px-3 pb-3">
                           <label className="form-label fw-bold">Answers:</label>
                           {q.questionType === "multi-select" && (
-                              <div>
-                                {q.possibleAnswers.map((opt, i) => {
-                                  const arr = getMultiArray(qKey);
-                                  const checked = arr.includes(opt);
-                                  const id = `${qKey}-opt-${i}`;
-                                  return (
-                                      <div key={id} className="form-check mb-2">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            id={id}
-                                            checked={checked}
-                                            onChange={() => toggleMulti(qKey, opt)}
-                                            style={{transform: "scale(1.5)"}}
-                                        />
-                                        <label className="form-check-label fs-5" htmlFor={id}>
-                                          {opt}
-                                        </label>
-                                      </div>
-                                  );
-                                })}
-                              </div>
+                            <div>
+                              {q.possibleAnswers.map((opt, i) => {
+                                const id = `${qKey}-opt-${i}`;
+                                const checked = answers[qKey] === opt;
+                                return (
+                                  <div key={id} className="form-check mb-2">
+                                    <input
+                                      className="form-check-input"
+                                      type="radio"
+                                      name={qKey}
+                                      id={id}
+                                      value={opt}
+                                      checked={checked}
+                                      onChange={() => setSingle(qKey, opt)}
+                                      style={{ transform: "scale(1.5)" }}
+                                    />
+                                    <label className="form-check-label fs-5" htmlFor={id}>
+                                      {opt}
+                                    </label>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           )}
 
                           {q.questionType === "true-false" && (
