@@ -37,7 +37,8 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
   useState(details.options?.accessCode ?? "");
     const [questionLock, setQuestionLock] = useState(details.options?.lockEnabled ?? false);
     const [showAnswers, setShowAnswers] = useState(details.option?.showAnswers ?? null);
-
+    const [oneQuestionAtATime, setOneQuestionAtATime] =
+  useState(details.options?.oneQuestionAtATime ?? false);
     useEffect(() => {
         setContent(details.description || '');
         setTitle(details.title || '');
@@ -52,6 +53,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         setAccessCode(details.options?.accessCode ?? "");
         setQuestionLock(details.options?.lockEnabled);
         setShowAnswers(details.options?.showAnswers);
+        setOneQuestionAtATime(details.options?.oneQuestionAtATime ?? false);
     }, [details]);
 
     useImperativeHandle(ref, () => ({
@@ -69,7 +71,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                 quizType,
                 group,
                 options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts, questionLock: questionLock, showAnswers: showAnswers,
-                      accessCode : accessCode,  
+                      accessCode : accessCode,  oneQuestionAtATime: oneQuestionAtATime,
                 },
                 assignTo
             };
@@ -235,6 +237,18 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                                         className="ms-3"
                                     />
                                 </div>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label className="mb-0" style={{ minWidth: '150px' }}>
+                                        One question at a time
+                                    </Form.Label>
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="wd-one-q-at-a-time"
+                                        checked={oneQuestionAtATime}
+                                        onChange={e => setOneQuestionAtATime(e.target.checked)}
+                                        className="mb-0 ms-3"
+                                    />
+                                    </div>
                                 <div className="mb-2 d-flex align-items-center">
                                         <Form.Label htmlFor="wd-showAnswers" className="mb-0" style={{minWidth: '150px'}}>
                                             Show Answers
