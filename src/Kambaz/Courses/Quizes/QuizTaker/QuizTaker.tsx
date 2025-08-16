@@ -22,6 +22,15 @@ export default function QuizTaker() {
   const [timerStarted, setTimerStarted] = useState(false);
  const [attemptScore, setAttemptScore] = useState(null);
 
+
+ //one question at a time
+ const [oneAtATime, setOneAtATime] = useState(false);
+const [qIndex, setQIndex] = useState(0);
+const goPrev = () => setQIndex((i) => (i > 0 ? i - 1 : i));
+const goNext = () => setQIndex((i) => (i < questions.length - 1 ? i + 1 : i));
+
+
+
   useEffect(() => {
     if (!timerStarted || timeLeft <= 0) return;
 
@@ -58,6 +67,9 @@ useEffect(() => {
     if(data.details.options.accessCode === accessCode){
       setShowQuiz(true);
     }
+
+  setOneAtATime(!!data?.details?.options?.oneQuestionAtATime);
+  setQIndex(0);
 
   })();
 }, [qid]);
@@ -151,7 +163,13 @@ const onSubmit = async () => {
      navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/result`); 
   }
 };
+
+  const renderList = oneAtATime
+  ? (questions[qIndex] ? [questions[qIndex]] : [])
+  : questions;
+
   if (loading) return null;
+  
 
   return (
       <div className="container-fluid p-4">
@@ -210,46 +228,49 @@ const onSubmit = async () => {
             )}
 
 
-            {questions.map((q, index) => {
-              const qKey = q.questionId ?? String(index);
+            {renderList.map((q, index) => {
+                const realIndex = oneAtATime ? qIndex : index;
+                const qKey = q.questionId ?? String(realIndex);
 
-
-              return (
+                return (
                   <div className="row mb-4" key={qKey}>
                     <div className="col-12">
                       <div className="border rounded">
-                        <div
-                            className="px-3 py-2 bg-light d-flex justify-content-between align-items-center border-bottom">
+                        <div className="px-3 py-2 bg-light d-flex justify-content-between align-items-center border-bottom">
                           <div className="d-flex align-items-center">
-                            <span className="fw-bold me-2">Question {index + 1}:</span>
+                            <span className="fw-bold me-2">
+                              Question {realIndex + 1}{oneAtATime ? ` / ${questions.length}` : ""}:
+                            </span>
                             <span className="fw-semibold">{q.questionTitle}</span>
                           </div>
                           <div className="d-flex align-items-center text-muted">
-                    <span className="me-3">
-                      <span className="me-2">pts:</span>
-                      <span className="fw-bold">{q.points}</span>
-                    </span>
+                            <span className="me-3">
+                              <span className="me-2">pts:</span>
+                              <span className="fw-bold">{q.points}</span>
+                            </span>
                             <span></span>
                           </div>
                         </div>
 
                         {q.questionDescription && (
-                            <div className="px-3 py-3" style={{height: 200, overflowY: "auto"}}>
-                              <div
-                                  className="text-secondary"
-                                  dangerouslySetInnerHTML={{__html: q.questionDescription}}
-                              />
-                            </div>
+                          <div className="px-3 py-3" style={{ height: 200, overflowY: "auto" }}>
+                            <div
+                              className="text-secondary"
+                              dangerouslySetInnerHTML={{ __html: q.questionDescription }}
+                            />
+                          </div>
                         )}
+
                         <div
-                            className="bg-light px-3 py-0 d-flex justify-content-end align-items-center text-muted small border-top"
-                            style={{height: 60}}
+                          className="bg-light px-3 py-0 d-flex justify-content-end align-items-center text-muted small border-top"
+                          style={{ height: 60 }}
                         >
                           <span></span>
                         </div>
 
                         <div className="px-3 pb-3">
                           <label className="form-label fw-bold">Answers:</label>
+
                           {q.questionType === "multi-select" && (
                             <div>
                               {q.possibleAnswers.map((opt, i) => {
@@ -277,72 +298,95 @@ const onSubmit = async () => {
                           )}
 
                           {q.questionType === "true-false" && (
-                              <div>
-                                {(q.possibleAnswers?.length ? q.possibleAnswers : ["True", "False"]).map(
-                                    (opt, i) => {
-                                      const id = `${qKey}-tf-${i}`;
-                                      const checked = answers[qKey] === opt;
-                                      return (
-                                          <div key={id} className="form-check mb-2">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                name={qKey}
-                                                id={id}
-                                                value={opt}
-                                                checked={checked}
-                                                onChange={() => setSingle(qKey, opt)}
-                                                style={{transform: "scale(1.5)"}}
-                                            />
-
-                                            <label className="form-check-label fs-5" htmlFor={id}>
-                                              {opt}
-                                            </label>
-                                          </div>
-                                      );
-                                    }
-                                )}
-                              </div>
+                            <div>
+                              {(q.possibleAnswers?.length ? q.possibleAnswers : ["True", "False"]).map(
+                                (opt, i) => {
+                                  const id = `${qKey}-tf-${i}`;
+                                  const checked = answers[qKey] === opt;
+                                  return (
+                                    <div key={id} className="form-check mb-2">
+                                      <input
+                                        className="form-check-input"
+                                        type="radio"
+                                        name={qKey}
+                                        id={id}
+                                        value={opt}
+                                        checked={checked}
+                                        onChange={() => setSingle(qKey, opt)}
+                                        style={{ transform: "scale(1.5)" }}
+                                      />
+                                      <label className="form-check-label fs-5" htmlFor={id}>
+                                        {opt}
+                                      </label>
+                                    </div>
+                                  );
+                                }
+                              )}
+                            </div>
                           )}
 
                           {q.questionType === "fill-in-blank" && (
-                              <>
-                                <div className="mb-2">
-                                  <label className="form-label text-dark">Your Answer:</label>
-                                </div>
-
-                                <ReactQuill
-                                    theme="snow"
-                                    value={answers[qKey] ?? ""}
-                                    onChange={(val) => setSingle(qKey, val)}
-                                    placeholder="Enter your answer..."
-                                    style={{height: 160}}
-                                    modules={{
-                                      toolbar: [
-                                        [{size: ["small", false, "large"]}],
-                                        ["bold", "italic", "underline"],
-                                        [{list: "ordered"}, {list: "bullet"}],
-                                        ["clean"],
-                                      ],
-                                    }}
-                                />
-                              </>
+                            <>
+                              <div className="mb-2">
+                                <label className="form-label text-dark">Your Answer:</label>
+                              </div>
+                              <ReactQuill
+                                theme="snow"
+                                value={answers[qKey] ?? ""}
+                                onChange={(val) => setSingle(qKey, val)}
+                                placeholder="Enter your answer..."
+                                style={{ height: 160 }}
+                                modules={{
+                                  toolbar: [
+                                    [{ size: ["small", false, "large"] }],
+                                    ["bold", "italic", "underline"],
+                                    [{ list: "ordered" }, { list: "bullet" }],
+                                    ["clean"],
+                                  ],
+                                }}
+                              />
+                            </>
                           )}
                         </div>
                       </div>
                     </div>
                   </div>
-              );
-            })}
+                );
+              })}
 
-            <div className="d-flex justify-content-start">
-              <Button variant="secondary" className="me-2" onClick={() => navigate(-1)}>
-                Cancel
-              </Button>
+          <div className="d-flex justify-content-start align-items-center">
+            <Button variant="secondary" className="me-2" onClick={() => navigate(-1)}>
+              Cancel
+            </Button>
+
+            {oneAtATime ? (
+              <>
+                <Button
+                  variant="outline-secondary"
+                  className="me-2"
+                  onClick={goPrev}
+                  disabled={qIndex === 0}
+                >
+                  Previous
+                </Button>
+
+                {qIndex < questions.length - 1 ? (
+                  <Button variant="primary" onClick={goNext}>
+                    Next
+                  </Button>
+                ) : (
+                  <Button variant="danger" onClick={onSubmit}>
+                    Submit
+                  </Button>
+                )}
+              </>
+            ) : (
               <Button variant="danger" onClick={onSubmit}>
                 Submit
               </Button>
-            </div>
+            )}
+          </div>
+
           </div>
         :
           <Modal show={true} style={{marginLeft:'5vw', marginTop: '10vh'}}>
