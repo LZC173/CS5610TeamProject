@@ -12,6 +12,7 @@ import * as courseClient from "./client.ts";
 import {useEffect, useState} from "react";
 import Quizzes from "./Quizes";
 import QuizEditor from "./Quizes/Editor";
+import QuizDetails from "./Quizes/QuizDetails";
 import QuizTaker from "./Quizes/QuizTaker/QuizTaker";
 import QuizResult from "./Quizes/QuizTaker/QuizResult";
 
@@ -49,6 +50,7 @@ export default function Courses({ courses }: { courses: any[]; }) {
                         <Route path="Quizzes" element={<Quizzes/>}/>
                         <Route path="Quizzes/:qid" element={<QuizEditor />} />
                         <Route path="Quizzes/create" element={<QuizEditor/>}/>
+                        <Route path="Quizzes/:qid/details" element={<QuizDetails/>}/>
                         <Route path="Quizzes/:qid/take" element={<QuizTaker />} />
                         <Route path="Quizzes/:qid/result" element={<QuizResult />} />
                         <Route path="Piazza" element={<h1>Piazza</h1>} />

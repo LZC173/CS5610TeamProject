@@ -198,7 +198,26 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
                     </div>
 
                     <div className="d-flex align-items-center">
-                      <QuizItemButtons published={published} />
+                      {/* <QuizItemButtons published={published} /> */}
+                      
+                      {/* {canEdit && (
+                        <QuizItemButtons
+                          published={published}
+                          quizId={q.quizId}
+                          onDelete={handleDelete}
+                          onTogglePublish={async (id, current) => {
+                            // Call API to toggle publish
+                            // await quizzesClient.updateQuizPublishState(id, !current);
+                            // Refresh list
+                            // fetchQuizzes(cid as string);
+                          }}
+                        />
+                      )} */}
+                      <QuizItemButtons 
+                        published={published} 
+                        quizId={q.quizId} 
+                        courseId={cid as string} 
+                      />
                       {canEdit && (
                         <FaTrash
                           className="text-danger fs-5 ms-3"
