@@ -36,9 +36,11 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
     const [accessCode, setAccessCode] =
   useState(details.options?.accessCode ?? "");
     const [questionLock, setQuestionLock] = useState(details.options?.lockEnabled ?? false);
-    const [showAnswers, setShowAnswers] = useState(details.option?.showAnswers ?? null);
+    const [showAnswers, setShowAnswers] = useState<string>(details.options?.showAnswers ?? "");
     const [oneQuestionAtATime, setOneQuestionAtATime] =
   useState(details.options?.oneQuestionAtATime ?? false);
+  const [webCamRequired, setWebCamRequired] =
+  useState(details.options?.webCamRequired ?? false);
     useEffect(() => {
         setContent(details.description || '');
         setTitle(details.title || '');
@@ -52,8 +54,9 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         setAssignTo(details.assignTo ?? 'Everyone');
         setAccessCode(details.options?.accessCode ?? "");
         setQuestionLock(details.options?.lockEnabled);
-        setShowAnswers(details.options?.showAnswers);
+        setShowAnswers(details.options?.showAnswers ?? "");
         setOneQuestionAtATime(details.options?.oneQuestionAtATime ?? false);
+        setWebCamRequired(details.options?.webCamRequired ?? false);
     }, [details]);
 
     useImperativeHandle(ref, () => ({
@@ -71,7 +74,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                 quizType,
                 group,
                 options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts, questionLock: questionLock, showAnswers: showAnswers,
-                      accessCode : accessCode,  oneQuestionAtATime: oneQuestionAtATime,
+                      accessCode : accessCode,  oneQuestionAtATime: oneQuestionAtATime,webCamRequired: webCamRequired,
                 },
                 assignTo
             };
@@ -262,6 +265,18 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                                             onChange={e => setShowAnswers(e.target.value)}
                                         />
                                 </div>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label className="mb-0" style={{ minWidth: '150px' }}>
+                                        Require Webcam
+                                    </Form.Label>
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="wd-webcam-required"
+                                        checked={webCamRequired}
+                                        onChange={e => setWebCamRequired(e.target.checked)}
+                                        className="mb-0 ms-3"
+                                    />
+                                    </div>
                             </Card.Body>
                         </Card>
                     </Col>

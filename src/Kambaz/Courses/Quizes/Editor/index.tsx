@@ -5,13 +5,14 @@ import Nav from "react-bootstrap/Nav";
 import QuizDetailsEditor from "./QuizDetailsEditor.tsx";
 import QuizQuestions from "./QuizQuestions.tsx";
 import * as quizClient from "../client.ts";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import {useDispatch, useSelector} from "react-redux";
 import { clearData, setDetails, setPoints, setQuestions} from "./reducer.ts";
 import {FaCheckCircle} from "react-icons/fa";
 
 export default function QuizEditor() {
+     const navigate = useNavigate();
     const [quizSate, setQuizSate] = useState(false);
     const [selectedTab, setSelectedTab] = useState('Details');
     const [loaded, setLoaded] = useState(false);
@@ -26,9 +27,9 @@ export default function QuizEditor() {
     };
     const details    = useSelector((state: any) => state.editorReducer.details);
     const questions  = useSelector((state: any) => state.editorReducer.questions);
-    const newIds     = useSelector((state: any) => state.editorReducer.newQuestionIds)    as Set<string>;
-    const updatedIds = useSelector((state: any) => state.editorReducer.updatedQuestionIds) as Set<string>;
-    const deletedIds = useSelector((state: any) => state.editorReducer.deleteQuestionIds)  as Set<string>;
+     const newIds     = useSelector((s: any) => s.editorReducer.newQuestionIds)     as string[];
+ const updatedIds = useSelector((s: any) => s.editorReducer.updatedQuestionIds) as string[];
+ const deletedIds = useSelector((s: any) => s.editorReducer.deleteQuestionIds)  as string[];
     const points     = useSelector((state: any)=> state.editorReducer.points);
     const detailsEditorRef = useRef<{ saveCurrentState: () => any }>(null);
 
@@ -53,25 +54,40 @@ export default function QuizEditor() {
        }
     }, [qid])
 
-    const saveQuiz = async  (status: boolean)=>{
-        const newIdsSet = new Set(newIds);
-        const updatedIdsSet = new Set(updatedIds);
-        // @ts-ignore
-        const data = detailsEditorRef.current.saveCurrentState()
-        dispatch(setDetails(data))
-        const requestBody = {
-            quizId: qid || null,
-            published: status,
-            quizDetails: data,
-            questions: {
-                quizId: qid || null,
-                deleteQuestionsIds: deletedIds,
-                updatedQuestions: questions.filter((q: { questionId: string; }) => updatedIdsSet.has(q.questionId)),
-                newQuestions: questions.filter((q: { questionId: string; }) => newIdsSet.has(q.questionId)),
-            }
-        };
-        await quizClient.createNew(requestBody, cid as string);
-    }
+    const saveQuiz = async (status: boolean) => {
+  try {
+    const newIdsSet = new Set(newIds);
+    const updatedIdsSet = new Set(updatedIds);
+    const data =
+      selectedTab === "Details" &&
+      detailsEditorRef.current &&
+      typeof detailsEditorRef.current.saveCurrentState === "function"
+        ? detailsEditorRef.current.saveCurrentState()
+        : details;
+    dispatch(setDetails(data));
+    const requestBody = {
+      quizId: qid || null,
+      published: status,
+      quizDetails: data,
+      questions: {
+        quizId: qid || null,
+        deleteQuestionsIds: deletedIds,
+        updatedQuestions: questions.filter((q: { questionId: string }) =>
+          updatedIdsSet.has(q.questionId)
+        ),
+        newQuestions: questions.filter((q: { questionId: string }) =>
+          newIdsSet.has(q.questionId)
+        ),
+      },
+    };
+
+    await quizClient.createNew(requestBody, cid as string);
+    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+  } catch (e) {
+    console.error(e);
+    alert("Save failed");
+  }
+};
 
     return (
         loaded && (
@@ -127,7 +143,7 @@ export default function QuizEditor() {
                 <div className="container-fluid p-3">
                     <hr/>
                     <div className="d-flex justify-content-end">
-                        <Button variant="secondary" className="me-2">
+                        <Button variant="secondary" className="me-2" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}>
                             Cancel
                         </Button>
                         <Button variant="danger" className="me-2" onClick={()=> saveQuiz(quizSate)}>
