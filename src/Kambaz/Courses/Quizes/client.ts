@@ -19,7 +19,7 @@ export const createNew =  async (quiz: any, courseId: string) => {
     return response.data;
 }
 export const updateStatus = async (quizId: string, status: boolean ) => {
-    const response = await axios.put(`${REMOTE_SERVER}/api/updateStatus`, { quizId: quizId, status: status});
+    const response = await axios.put(`${REMOTE_SERVER}/api/quizzes/updateStatus`, { quizId: quizId, status: status});
     return response.data
 }
 
