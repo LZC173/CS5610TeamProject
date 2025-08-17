@@ -17,7 +17,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
     const [points, setPoints] = useState(4);
     const [questionText, setQuestionText] = useState('');
     const [answers, setAnswers] = useState(['', '']);
-    const [correctAnswer, setCorrectAnswer] = useState('');
+    const [correctAnswers, setCorrectAnswers] = useState<string[]>([]);
     const [wordCount, setWordCount] = useState(0);
     const [title, setTitle] = useState("");
     const dispatch = useDispatch();
@@ -31,7 +31,13 @@ export default function QuestionEditor({ question, onSave }: Props) {
             setTitle(question.questionTitle)
             setQuestionText(question.questionDescription);
             setAnswers(question.possibleAnswers.length > 0 ? question.possibleAnswers : ['', '']);
-            setCorrectAnswer(question.correctAnswers);
+
+            if (Array.isArray(question.correctAnswers)) {
+                setCorrectAnswers(question.correctAnswers);
+            } else {
+                setCorrectAnswers(question.correctAnswers ? [question.correctAnswers] : []);
+            }
+
             setWordCount(question.questionDescription.length);
             setInitialPoints(question.points);
         } else {
@@ -39,14 +45,14 @@ export default function QuestionEditor({ question, onSave }: Props) {
             setPoints(4);
             setQuestionText('');
             setAnswers(['', '']);
-            setCorrectAnswer('');
+            setCorrectAnswers([]);
             setWordCount(0);
         }
     }, [question]);
 
     const handleQuestionTypeChange = (type: string) => {
         setQuestionType(type);
-        setCorrectAnswer('');
+        setCorrectAnswers([]);
 
         if (type === 'multi-select') {
             setAnswers(['', '']);
@@ -54,6 +60,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
             setAnswers(['True', 'False']);
         } else if (type === 'fill-in-blank') {
             setAnswers([]);
+            setCorrectAnswers(['']);
         }
     };
 
@@ -67,20 +74,55 @@ export default function QuestionEditor({ question, onSave }: Props) {
         if (questionType === 'multi-select' && answers.length > 2) {
             const newAnswers = answers.filter((_, i) => i !== index);
             setAnswers(newAnswers);
-            if (correctAnswer === answers[index]) {
-                setCorrectAnswer('');
-            }
+            const removedAnswer = answers[index];
+            setCorrectAnswers(correctAnswers.filter(answer => answer !== removedAnswer));
         }
     };
 
     const updateAnswerOption = (index: number, value: string) => {
         const newAnswers = [...answers];
+        const oldValue = newAnswers[index];
         newAnswers[index] = value;
         setAnswers(newAnswers);
+        if (correctAnswers.includes(oldValue)) {
+            const updatedCorrectAnswers = correctAnswers.map(answer =>
+                answer === oldValue ? value : answer
+            );
+            setCorrectAnswers(updatedCorrectAnswers);
+        }
     };
 
-    const handleCorrectAnswerChange = (value: string) => {
-        setCorrectAnswer(value);
+    const handleCorrectAnswerToggle = (value: string) => {
+        if (questionType === 'multi-select') {
+            if (correctAnswers.includes(value)) {
+                setCorrectAnswers(correctAnswers.filter(answer => answer !== value));
+            } else {
+                setCorrectAnswers([...correctAnswers, value]);
+            }
+        } else {
+            setCorrectAnswers([value]);
+        }
+    };
+
+    const addCorrectAnswer = () => {
+        if (questionType === 'fill-in-blank') {
+            setCorrectAnswers([...correctAnswers, '']);
+        }
+    };
+
+    const removeCorrectAnswer = (index: number) => {
+        if (questionType === 'fill-in-blank' && correctAnswers.length > 1) {
+            const newAnswers = correctAnswers.filter((_, i) => i !== index);
+            setCorrectAnswers(newAnswers);
+        }
+    };
+
+    const updateCorrectAnswer = (index: number, value: string) => {
+        if (questionType === 'fill-in-blank') {
+            const newAnswers = [...correctAnswers];
+            newAnswers[index] = value;
+            setCorrectAnswers(newAnswers);
+        }
     };
 
     return (
@@ -106,7 +148,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
                             className="form-control"
                             value={points}
                             onChange={(e) => setPoints(parseInt(e.target.value) || 0)}
-                            style={{width: '80px'}}
+                            style={{width: '5vw'}}
                             min="0"/>
                     </div>
                 </div>
@@ -115,7 +157,12 @@ export default function QuestionEditor({ question, onSave }: Props) {
             <div className="row mb-3">
                 <div className="col-12">
                     <p className="text-muted small mb-3">
-                        Enter your question and multiple answers, then select the one correct answer.
+                        {questionType === 'multi-select'
+                            ? 'Enter your question and multiple answers, then select all correct answers.'
+                            : questionType === 'fill-in-blank'
+                                ? 'Enter your question and provide multiple expected answers for fill-in-the-blank fields.'
+                                : 'Enter your question and select the correct answer.'
+                        }
                         <input
                             type="text"
                             className="form-control me-2"
@@ -132,7 +179,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
                 <div className="border rounded-top bg-light px-3 py-2">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <div className="d-flex gap-3">
-                        <button className="btn btn-link p-0 text-black text-decoration-none small">Edit</button>
+                            <button className="btn btn-link p-0 text-black text-decoration-none small">Edit</button>
                             <button className="btn btn-link p-0 text-black text-decoration-none small">View</button>
                             <button className="btn btn-link p-0 text-black text-decoration-none small">Insert
                             </button>
@@ -150,9 +197,9 @@ export default function QuestionEditor({ question, onSave }: Props) {
                     <ReactQuill
                         theme="snow"
                         value={questionText}
-                             onChange={(value) => {
-                               setQuestionText(value)
-                               setWordCount(value.split(/\s+/).length)
+                        onChange={(value) => {
+                            setQuestionText(value)
+                            setWordCount(value.split(/\s+/).length)
                         }}
                         style={{height: '200px'}}
                         modules={{
@@ -186,19 +233,20 @@ export default function QuestionEditor({ question, onSave }: Props) {
 
                     {questionType === 'multi-select' && (
                         <div>
+
                             {answers.map((answer, index) => (
                                 <div key={index} className="d-flex align-items-center mb-3">
                                     <div className="form-check me-3">
                                         <input
                                             className="form-check-input"
-                                            type="radio"
-                                            name="correctAnswer"
+                                            type="checkbox"
                                             value={answer}
-                                            checked={correctAnswer === answer}
-                                            onChange={(e) => handleCorrectAnswerChange(e.target.value)}
+                                            checked={correctAnswers.includes(answer) && answer !== ''}
+                                            onChange={() => handleCorrectAnswerToggle(answer)}
+                                            disabled={answer === ''}
                                         />
                                         <label className="form-check-label text-success">
-                                            {(correctAnswer === answer && correctAnswer !== "") ? 'Correct Answer' : 'Possible Answer'}
+                                            {correctAnswers.includes(answer) && answer !== '' ? 'Correct Answer' : 'Possible Answer'}
                                         </label>
                                     </div>
                                     <input
@@ -221,9 +269,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
                                     )}
                                 </div>
                             ))}
-
-                            {answers.length < 6 && (
-                                <div className="mb-3">
+                            <div className="mb-3">
                                     <button
                                         className="btn btn-link text-danger p-0"
                                         onClick={addAnswerOption}
@@ -231,7 +277,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
                                         + Add Another Answer
                                     </button>
                                 </div>
-                            )}
+
                         </div>
                     )}
 
@@ -245,11 +291,11 @@ export default function QuestionEditor({ question, onSave }: Props) {
                                             type="radio"
                                             name="correctAnswer"
                                             value={answer}
-                                            checked={correctAnswer === answer}
-                                            onChange={(e) => handleCorrectAnswerChange(e.target.value)}
+                                            checked={correctAnswers.includes(answer)}
+                                            onChange={() => handleCorrectAnswerToggle(answer)}
                                         />
                                         <label className="form-check-label text-success">
-                                            {correctAnswer === answer ? 'Correct Answer' : 'Possible Answer'}
+                                            {correctAnswers.includes(answer) ? 'Correct Answer' : 'Possible Answer'}
                                         </label>
                                     </div>
                                     <span className="form-control-plaintext fw-semibold">
@@ -263,15 +309,35 @@ export default function QuestionEditor({ question, onSave }: Props) {
                     {questionType === 'fill-in-blank' && (
                         <div className="alert alert-secondary">
                             <div className="mb-3">
-                                <label className="form-label text-dark">Expected Answer:</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={correctAnswer}
-                                    onChange={(e) => setCorrectAnswer(e.target.value)}
-                                    placeholder="Enter the correct answer..."
-                                    style={{width: '300px'}}
-                                />
+                                {correctAnswers.map((answer, index) => (
+                                    <div key={index} className="d-flex align-items-center mb-2">
+                                        <input
+                                            type="text"
+                                            className="form-control me-2"
+                                            value={answer}
+                                            onChange={(e) => updateCorrectAnswer(index, e.target.value)}
+                                            placeholder={`Answer ${index + 1}`}
+                                            style={{width: '20vw'}}
+                                        />
+                                        {correctAnswers.length > 1 && (
+                                            <button
+                                                className="btn btn-outline-danger btn-sm"
+                                                onClick={() => removeCorrectAnswer(index)}
+                                            >
+                                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                <button
+                                    className="btn btn-link p-0 small"
+                                    onClick={addCorrectAnswer}
+                                >
+                                        + Add Answer
+                                </button>
                             </div>
                         </div>
                     )}
@@ -279,39 +345,42 @@ export default function QuestionEditor({ question, onSave }: Props) {
             </div>
             <hr/>
             <div className="d-flex justify-content-start">
-                  <Button
+                <Button
                     variant="secondary"
                     className="me-2"
-                   onClick={() => onSave()}
-                  >
-                    Cancel
-                 </Button>
-                <Button
-                variant="danger"
-                onClick={() => {
-                    const payload: QuestionDetails = {
-                    questionId: question?.questionId,       
-                    questionTitle: title,
-                    questionDescription: questionText,
-                    questionType: questionType,
-                    possibleAnswers: answers,
-                    correctAnswers: correctAnswer,
-                    points: points
-                    };
-
-                    if (question && question.questionId) {
-
-                    dispatch(updateQuestion(payload));
-                    dispatch(changePoints(payload.points - initialPoints))
-                    } else {
-                    dispatch(addQuestion(payload));
-                    dispatch(changePoints(payload.points))
-                    }
-                    onSave();
-
-                }}
+                    onClick={() => onSave()}
                 >
-                SaveQuestion
+                    Cancel
+                </Button>
+                <Button
+                    variant="danger"
+                    onClick={() => {
+                        let finalCorrectAnswers = correctAnswers;
+                        if (questionType === 'fill-in-blank') {
+                            finalCorrectAnswers = correctAnswers.filter(answer => answer.trim() !== '');
+                        }
+
+                        const payload: QuestionDetails = {
+                            questionId: question?.questionId,
+                            questionTitle: title,
+                            questionDescription: questionText,
+                            questionType: questionType,
+                            possibleAnswers: answers,
+                            correctAnswers: finalCorrectAnswers,
+                            points: points
+                        };
+
+                        if (question && question.questionId) {
+                            dispatch(updateQuestion(payload));
+                            dispatch(changePoints(payload.points - initialPoints))
+                        } else {
+                            dispatch(addQuestion(payload));
+                            dispatch(changePoints(payload.points))
+                        }
+                        onSave();
+                    }}
+                >
+                    SaveQuestion
                 </Button>
             </div>
         </div>

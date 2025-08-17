@@ -4,6 +4,6 @@ export default interface QuestionDetails {
     questionDescription: string,
     questionType: string,
     possibleAnswers: string[],
-    correctAnswers: string,
+    correctAnswers: string[],
     points: number
 }
