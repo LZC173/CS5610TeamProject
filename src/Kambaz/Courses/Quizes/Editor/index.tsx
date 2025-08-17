@@ -54,7 +54,7 @@ export default function QuizEditor() {
        }
     }, [qid])
 
-    const saveQuiz = async (status: boolean) => {
+    const saveQuiz = async (status: boolean, goToDetails: boolean) => {
   try {
     const newIdsSet = new Set(newIds);
     const updatedIdsSet = new Set(updatedIds);
@@ -82,7 +82,13 @@ export default function QuizEditor() {
     };
 
     await quizClient.createNew(requestBody, cid as string);
-    navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+
+    if (goToDetails) {
+      navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/details`);
+    } else {
+      navigate(`/Kambaz/Courses/${cid}/Quizzes`);
+    }
+
   } catch (e) {
     console.error(e);
     alert("Save failed");
@@ -146,11 +152,19 @@ export default function QuizEditor() {
                         <Button variant="secondary" className="me-2" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}>
                             Cancel
                         </Button>
-                        <Button variant="danger" className="me-2" onClick={()=> saveQuiz(quizSate)}>
-                            Save
+                        <Button
+                        variant="danger"
+                        className="me-2"
+                        onClick={() => saveQuiz(quizSate, true)} //
+                        >
+                        Save
                         </Button>
-                        <Button variant="primary" onClick={()=>{setQuizSate(true); saveQuiz(true)}}>
-                            Save and Publish
+
+                        <Button
+                        variant="primary"
+                        onClick={() => saveQuiz(true, false)} // 
+                        >
+                        Save and Publish
                         </Button>
                     </div>
                 </div>
