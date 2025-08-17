@@ -58,7 +58,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
     };
 
     const addAnswerOption = () => {
-        if (questionType === 'multi-select' && answers.length < 6) {
+        if (questionType === 'multi-select') {
             setAnswers([...answers, '']);
         }
     };
