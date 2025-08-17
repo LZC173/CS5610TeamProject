@@ -123,6 +123,7 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
       <QuizzesControls
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
+         canEdit={canEdit}
       />
       <br /><br /><br /><br />
 
@@ -132,9 +133,20 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
             <FaCaretDown className="me-2 fs-3" />
             <span className="fw-bold">QUIZZES</span>
           </div>
+          {filtered.length === 0 ? 
+          <div className={`p-3 small border rounded-3 d-flex align-items-center gap-2 $
+            {canEdit ? "bg-light text-primary" : "bg-light text-muted"}`}>
+              {canEdit ? <> No quizzes yet — click the + to create one.</> : "No quizzes available."}
+              </div> : null}
 
           <ListGroup className="wd-lessons rounded-0">
-            {filtered.map((q) => {
+              {[...filtered]
+                .sort(
+                  (a, b) =>
+                    new Date(a.dates.availableFrom).getTime() -
+                    new Date(b.dates.availableFrom).getTime()
+                )
+                .map((q) => {
 
               const availableFrom = new Date(q.dates.availableFrom);
               const availableUntil = new Date(q.dates.availableUntil);
@@ -287,8 +299,9 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
           </Button>
         </Modal.Footer>
       </Modal>
+      
 
-                    
+        
 
     </div>
   );

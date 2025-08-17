@@ -355,7 +355,7 @@ const onSubmit = async () => {
               })}
 
           <div className="d-flex justify-content-start align-items-center">
-            <Button variant="secondary" className="me-2" onClick={() => navigate(-1)}>
+            <Button variant="secondary" className="me-2" onClick={onSubmit}>
               Cancel
             </Button>
 
