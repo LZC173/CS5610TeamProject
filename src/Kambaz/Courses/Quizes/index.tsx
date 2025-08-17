@@ -3,11 +3,11 @@ import { ListGroup, Modal, Button } from "react-bootstrap";
 import { useParams, Link, useNavigate } from "react-router-dom"; 
 import { useSelector, useDispatch } from "react-redux";
 import { GoRocket } from "react-icons/go";
-import { FaCaretDown, FaTrash } from "react-icons/fa";
+import { FaCaretDown} from "react-icons/fa";
 
 import QuizzesControls from "./QuizzesControls.tsx";
 import QuizItemButtons from "./QuizItemButtons.tsx";
-import {deleteQuiz, setQuizzes} from "./reducer.ts";
+import {setQuizzes} from "./reducer.ts";
 
 import type {QuizzesState} from "./reducer.ts";
 import * as quizzesClient from "./client.ts";
@@ -34,12 +34,12 @@ export default function Quizzes() {
   const filtered = quizzes
     .filter((q) => q.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this quiz?")) {
-      await quizzesClient.deleteQuiz(id);
-      dispatch(deleteQuiz(id));
-    }
-  };
+  //const handleDelete = async (id: string) => {
+    //if (window.confirm("Are you sure you want to delete this quiz?")) {
+    //  await quizzesClient.deleteQuiz(id);
+   //   dispatch(deleteQuiz(id));
+   // }
+  //};
 
   const fetchQuizzes = async (courseId: string) => {
     const quizzes = await quizzesClient.fetchQuizzes(courseId as string);

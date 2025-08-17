@@ -10,7 +10,7 @@ export default function QuizDetails() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [quizState, setQuizState] = useState(false);
+  const [, setQuizState] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   // Redux state
