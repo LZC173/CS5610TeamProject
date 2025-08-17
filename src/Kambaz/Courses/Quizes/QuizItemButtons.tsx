@@ -1,6 +1,7 @@
 import { Dropdown } from "react-bootstrap";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { FaCheckCircle } from "react-icons/fa";
 // import quizzesClient from "../../api/quizzesClient"; // Adjust the path as needed
 import * as quizzesClient from "./client.ts";
 import {deleteQuiz, setQuizzes} from "./reducer.ts";
@@ -23,6 +24,12 @@ export default function QuizItemButtons({ published, quizId, courseId }: QuizIte
 
   return (
     <Dropdown align="end">
+       {published ? (
+        <FaCheckCircle className="text-success fs-5 me-2" />
+        // <span className="text-success fs-5 me-2">✔️</span>
+      ) : (
+        <span className="text-danger fs-5 me-2">🚫</span>
+      )}
       <Dropdown.Toggle
         as="span"
         style={{ cursor: "pointer" }}
