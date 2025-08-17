@@ -24,7 +24,7 @@ export const updateStatus = async (quizId: string, status: boolean ) => {
 }
 
 
-export type AttemptAnswers = Record<string, string>; // using string to string json file which is similar to
+export type AttemptAnswers = Record<string, string[]>; // using string to string json file which is similar to
 //map in backend 
 
 export const getAttemptDetails = async (quizId: string) => {

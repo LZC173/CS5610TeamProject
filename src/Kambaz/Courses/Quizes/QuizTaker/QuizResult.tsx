@@ -5,7 +5,6 @@ import {Button, Badge, Alert} from "react-bootstrap";
 import * as quizClient from "../client.ts";
 import type QuestionDetails from "../Interface/QuestionDetails";
 
-type AnswersMap = Record<string, string>;
 
 export default function QuizResult() {
   const { cid, qid } = useParams<{ cid: string; qid: string }>();
@@ -14,7 +13,7 @@ export default function QuizResult() {
   const [loading, setLoading] = useState(true);
   const [attempt, setAttempt] = useState<any>(null);
   const [questions, setQuestions] = useState<QuestionDetails[]>([]);
-  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [answers, setAnswers] = useState<Record<string, string[]>>({});
 
 
   const showAnswersAlert = useMemo(() => {
@@ -30,36 +29,30 @@ export default function QuizResult() {
     return null;
   }, [attempt]);
 
-  useEffect(() => {
-    (async () => {
-      if (!qid) return;
-      const data = await quizClient.getAttemptDetails(qid);
-      if (!data) {
-        setAttempt(null);
-        setQuestions([]);
-        setAnswers({});
-        setLoading(false);
-        return;
-      }
+ useEffect(() => {
+  (async () => {
+    if (!qid) return;
+    const data = await quizClient.getAttemptDetails(qid);
 
-      const ansObj: AnswersMap = {};
-      if (data.answers) {
-        Object.entries(data.answers as Record<string, any>).forEach(([k, v]) => {
-          ansObj[k] = String(v ?? "");
-        });
-      }
-
-      const qs: QuestionDetails[] = (data.quiz?.questions ?? []).map((q: any) => ({
-        ...q,
-        correctAnswers: q.correctAnswers ?? "",
-      }));
-
-      setAttempt(data);
-      setQuestions(qs);
-      setAnswers(ansObj);
+    if (!data) {
+      setAttempt(null);
+      setQuestions([]);
+      setAnswers({});
       setLoading(false);
-    })();
-  }, [qid]);
+      return;
+    }
+
+    const qs: QuestionDetails[] = (data.quiz?.questions ?? []).map((q: any) => ({
+      ...q,
+      correctAnswers: q.correctAnswers ?? "",
+    }));
+
+    setAttempt(data);
+    setQuestions(qs);
+    setAnswers((data.answers ?? {}) as Record<string, string[]>); //
+    setLoading(false);
+  })();
+}, [qid]);
 
   const totalPoints = useMemo(
     () => questions.reduce((sum, q) => sum + (Number(q.points) || 0), 0),
@@ -67,10 +60,19 @@ export default function QuizResult() {
   );
 
   const isCorrect = (q: QuestionDetails) => {
-    const ua = answers[q.questionId ?? ""] ?? "";
-    const ca = q.correctAnswers ?? "";
-    return ua === ca;
-  };
+  const ua = answers[q.questionId ?? ""] ?? [];
+  const caRaw = (q as any).correctAnswers; 
+  const ca = Array.isArray(caRaw) ? caRaw : (caRaw ? [caRaw] : []);
+
+  if (q.questionType === "multi-select") {
+    const A = new Set(ua.filter(Boolean));
+    const B = new Set(ca.filter(Boolean));
+    if (A.size !== B.size) return false;
+    for (const x of A) if (!B.has(x)) return false;
+    return true;
+  }
+  return (ua[0] ?? "") === (ca[0] ?? "");
+};
 
   if (loading) return null;
 
@@ -114,62 +116,76 @@ export default function QuizResult() {
       </div>
 
       {questions.map((q, index) => {
-        const qidKey = q.questionId ?? String(index);
-        const userAns = answers[qidKey] ?? "";
-        const correctAns = q.correctAnswers ?? "";
-        const correct = isCorrect(q);
+            const qidKey = q.questionId ?? String(index);
 
-        return (
-          <div className="row mb-4" key={qidKey}>
-            <div className="col-12">
-              <div className="border rounded">
-                <div className="px-3 py-2 bg-light d-flex justify-content-between align-items-center border-bottom">
-                  <div className="d-flex align-items-center">
-                    <span className="fw-bold me-2">Question {index + 1}:</span>
-                    <span className="fw-semibold">{q.questionTitle}</span>
-                  </div>
-                  <div className="d-flex align-items-center gap-3">
-                    <span className="text-muted">
-                      <span className="me-2">pts:</span>
-                      <span className="fw-bold">{q.points}</span>
-                    </span>
-                    {q.correctAnswers && <Badge bg={correct ? "success" : "danger"}>
-                      {correct ? "Correct" : "Incorrect"}
-                    </Badge>}
-                  </div>
-                </div>
 
-                {q.questionDescription && (
-                  <div className="px-3 py-3" style={{ height: 200, overflowY: "auto" }}>
+            const userAnsArr = answers[qidKey] ?? [];
+
+            const correctAnsRaw = (q as any).correctAnswers;
+            const correctAnsArr = Array.isArray(correctAnsRaw)
+              ? correctAnsRaw
+              : (correctAnsRaw ? [correctAnsRaw] : []);
+
+            const hasCorrectDef = correctAnsArr.length > 0;
+            const correct = hasCorrectDef ? isCorrect(q) : false;
+
+            return (
+              <div className="row mb-4" key={qidKey}>
+                <div className="col-12">
+                  <div className="border rounded">
+                    <div className="px-3 py-2 bg-light d-flex justify-content-between align-items-center border-bottom">
+                      <div className="d-flex align-items-center">
+                        <span className="fw-bold me-2">Question {index + 1}:</span>
+                        <span className="fw-semibold">{q.questionTitle}</span>
+                      </div>
+                      <div className="d-flex align-items-center gap-3">
+                        <span className="text-muted">
+                          <span className="me-2">pts:</span>
+                          <span className="fw-bold">{q.points}</span>
+                        </span>
+                        {hasCorrectDef && (
+                          <Badge bg={correct ? "success" : "danger"}>
+                            {correct ? "Correct" : "Incorrect"}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {q.questionDescription && (
+                      <div className="px-3 py-3" style={{ height: 200, overflowY: "auto" }}>
+                        <div
+                          className="text-secondary"
+                          dangerouslySetInnerHTML={{ __html: q.questionDescription }}
+                        />
+                      </div>
+                    )}
+
                     <div
-                      className="text-secondary"
-                      dangerouslySetInnerHTML={{ __html: q.questionDescription }}
-                    />
-                  </div>
-                )}
+                      className="bg-light px-3 py-0 d-flex justify-content-end align-items-center text-muted small border-top"
+                      style={{ height: 60 }}
+                    >
+                      <span></span>
+                    </div>
 
-                <div
-                  className="bg-light px-3 py-0 d-flex justify-content-end align-items-center text-muted small border-top"
-                  style={{ height: 60 }}
-                >
-                  <span></span>
-                </div>
-
-                <div className="px-3 pb-3">
-                  <div className="mb-2">
-                    <span className="fw-bold me-2">Your Answer:</span>
-                    <span>{userAns || <em className="text-muted">N/A</em>}</span>
-                  </div>
-                  <div>
-                    <span className="fw-bold me-2">Correct Answer:</span>
-                    <span>{correctAns || <em className="text-muted">N/A</em>}</span>
+                    <div className="px-3 pb-3">
+                      <div className="mb-2">
+                        <span className="fw-bold me-2">Your Answer:</span>
+                        <span>
+                          {userAnsArr.length ? userAnsArr.join(", ") : <em className="text-muted">N/A</em>}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="fw-bold me-2">Correct Answer:</span>
+                        <span>
+                          {correctAnsArr.length ? correctAnsArr.join(", ") : <em className="text-muted">N/A</em>}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        );
-      })}
+            );
+          })}
 
       <div className="d-flex justify-content-start">
         <Button variant="secondary" onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes`)}>
