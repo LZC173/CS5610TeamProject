@@ -221,11 +221,11 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
                         courseId={cid as string} 
                       />
                       
-                        <FaTrash
+                        {/* <FaTrash
                           className="text-danger fs-5 ms-3"
                           style={{ cursor: "pointer" }}
                           onClick={() => handleDelete(q.quizId)}
-                        />
+                        /> */}
                         </div>
                       )}
                     

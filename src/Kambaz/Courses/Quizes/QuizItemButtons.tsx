@@ -5,6 +5,7 @@ import { FaCheckCircle } from "react-icons/fa";
 // import quizzesClient from "../../api/quizzesClient"; // Adjust the path as needed
 import * as quizzesClient from "./client.ts";
 import {deleteQuiz, setQuizzes} from "./reducer.ts";
+import { useSelector, useDispatch } from "react-redux";
 
 interface QuizItemButtonsProps {
   published: boolean;
@@ -14,7 +15,7 @@ interface QuizItemButtonsProps {
 
 export default function QuizItemButtons({ published, quizId, courseId }: QuizItemButtonsProps) {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const handleDelete = async (id: string) => {
       if (window.confirm("Are you sure you want to delete this quiz?")) {
         await quizzesClient.deleteQuiz(id);
@@ -62,9 +63,9 @@ export default function QuizItemButtons({ published, quizId, courseId }: QuizIte
 
 
 
-function dispatch(arg0: any) {
-  throw new Error("Function not implemented.");
-}
+// function dispatch(arg0: any) {
+//   throw new Error("Function not implemented.");
+// }
 // import { Dropdown } from "react-bootstrap";
 // import { IoEllipsisVertical } from "react-icons/io5";
 // import { useNavigate } from "react-router-dom";
