@@ -197,7 +197,7 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
                       </div>
                     </div>
 
-                    <div className="d-flex align-items-center">
+                    
                       {/* <QuizItemButtons published={published} /> */}
                       
                       {/* {canEdit && (
@@ -213,19 +213,22 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
                           }}
                         />
                       )} */}
+                      {canEdit && (
+                        <div className="d-flex align-items-center">
                       <QuizItemButtons 
                         published={published} 
                         quizId={q.quizId} 
                         courseId={cid as string} 
                       />
-                      {canEdit && (
+                      
                         <FaTrash
                           className="text-danger fs-5 ms-3"
                           style={{ cursor: "pointer" }}
                           onClick={() => handleDelete(q.quizId)}
                         />
+                        </div>
                       )}
-                    </div>
+                    
                   </div>
                 </ListGroup.Item>
               );

@@ -1,6 +1,9 @@
 import { Dropdown } from "react-bootstrap";
 import { IoEllipsisVertical } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+// import quizzesClient from "../../api/quizzesClient"; // Adjust the path as needed
+import * as quizzesClient from "./client.ts";
+import {deleteQuiz, setQuizzes} from "./reducer.ts";
 
 interface QuizItemButtonsProps {
   published: boolean;
@@ -10,6 +13,13 @@ interface QuizItemButtonsProps {
 
 export default function QuizItemButtons({ published, quizId, courseId }: QuizItemButtonsProps) {
   const navigate = useNavigate();
+
+  const handleDelete = async (id: string) => {
+      if (window.confirm("Are you sure you want to delete this quiz?")) {
+        await quizzesClient.deleteQuiz(id);
+        dispatch(deleteQuiz(id));
+      }
+    };
 
   return (
     <Dropdown align="end">
@@ -34,16 +44,20 @@ export default function QuizItemButtons({ published, quizId, courseId }: QuizIte
         >
           Edit
         </Dropdown.Item>
-        <Dropdown.Item>Delete</Dropdown.Item>
+        <Dropdown.Item onClick={() => handleDelete(quizId)}>Delete</Dropdown.Item>
         <Dropdown.Item>Publish</Dropdown.Item>
-        <Dropdown.Item>Copy</Dropdown.Item>
-        <Dropdown.Item>Sort</Dropdown.Item>
+        {/* <Dropdown.Item>Copy</Dropdown.Item> */}
+        {/* <Dropdown.Item>Sort</Dropdown.Item> */}
       </Dropdown.Menu>
     </Dropdown>
   );
 }
 
 
+
+function dispatch(arg0: any) {
+  throw new Error("Function not implemented.");
+}
 // import { Dropdown } from "react-bootstrap";
 // import { IoEllipsisVertical } from "react-icons/io5";
 // import { useNavigate } from "react-router-dom";
