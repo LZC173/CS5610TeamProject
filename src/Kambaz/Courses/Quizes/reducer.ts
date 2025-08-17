@@ -22,6 +22,7 @@ const quizzesSlice = createSlice({
     addQuiz: (
       state,
       action: PayloadAction<{
+        published: boolean;
         quizId?: string;
         course: string;
         title: string;
