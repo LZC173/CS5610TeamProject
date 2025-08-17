@@ -28,9 +28,9 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         details.dates?.dueDate?.slice(0, 16) || ''
     );
     const [quizType, setQuizType] = useState(details.quizType || 'GRADED_QUIZ');
-    const [group, setGroup] = useState(details.group || 'ASSIGNMENTS');
+    const [group, setGroup] = useState(details.assignmentGroup || 'ASSIGNMENTS');
     const [shuffleAnswers, setShuffleAnswers] = useState(details.options?.shuffleAnswers ?? false);
-    const [assignTo, setAssignTo] = useState(details.assignTo ?? 'Everyone');
+    const [assignTo, setAssignTo] = useState(details.assign ?? 'Everyone');
     const [attempts, setAttempts] = useState(details.options?.noOfAttempts ?? 1);
     const [timeLimit, setTimeLimit] = useState(details.options?.timeLimit ?? 20);
     const [accessCode, setAccessCode] =
@@ -49,13 +49,13 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         setAvailableUntil(details.dates?.availableUntil?.slice(0, 16) || '');
         setDueDate(details.dates?.dueDate?.slice(0, 16) || '');
         setQuizType(details.quizType || 'GRADED_QUIZ');
-        setGroup(details.group || 'ASSIGNMENTS');
+        setGroup(details.assignmentGroup || 'ASSIGNMENTS');
         setShuffleAnswers(details.options?.shuffleAnswers ?? false);
           setTimeLimit(details.options?.timeLimit ?? 20);  
         setHasTimeLimit(details.options?.timeLimit !== -1); 
-        setAssignTo(details.assignTo ?? 'Everyone');
+        setAssignTo(details.assign ?? 'Everyone');
         setAccessCode(details.options?.accessCode ?? "");
-        setQuestionLock(details.options?.lockEnabled);
+        setQuestionLock(details.options?.questionLocked ?? false);
         setShowAnswers(details.options?.showAnswers ?? "");
         setOneQuestionAtATime(details.options?.oneQuestionAtATime ?? false);
         setWebCamRequired(details.options?.webCamRequired ?? false);
@@ -74,11 +74,11 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                     dueDate: dueDate || new Date().toISOString().slice(0, 16)
                 },
                 quizType,
-                group,
-                options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts, questionLock: questionLock, showAnswers: showAnswers,
+                assignmentGroup: group,
+                options: { shuffleAnswers: shuffleAnswers, timeLimit: timeLimit, noOfAttempts: attempts, questionLocked: questionLock,  showAnswers: showAnswers,
                       accessCode : accessCode,  oneQuestionAtATime: oneQuestionAtATime,webCamRequired: webCamRequired,
                 },
-                assignTo
+                assign: assignTo
             };
         }
     }));

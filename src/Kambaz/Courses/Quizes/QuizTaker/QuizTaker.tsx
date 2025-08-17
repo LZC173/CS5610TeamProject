@@ -21,15 +21,30 @@ export default function QuizTaker() {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [timerStarted, setTimerStarted] = useState(false);
  const [, setAttemptScore] = useState(null);
-
+  const [questionLocked, setQuestionLocked] = useState(false);
+const [locked, setLocked] = useState<Record<string, boolean>>({});
 
  //one question at a time
  const [oneAtATime, setOneAtATime] = useState(false);
 const [qIndex, setQIndex] = useState(0);
-const goPrev = () => setQIndex((i) => (i > 0 ? i - 1 : i));
-const goNext = () => setQIndex((i) => (i < questions.length - 1 ? i + 1 : i));
+const goPrev = () => {
+  lockOnTurn(); //lock current page 
+  setQIndex((i) => (i > 0 ? i - 1 : i));
+};
+const goNext = () => {
+  lockOnTurn(); 
+  setQIndex((i) => (i < questions.length - 1 ? i + 1 : i));
+};
 
+  const lockOnTurn = () => {
+  if (!oneAtATime || !questionLocked) return;
+  const curQ = questions[qIndex];
+  if (!curQ) return;
 
+  const key = curQ.questionId ?? String(qIndex);
+  if (locked[key]) return;           //if locked return 
+  setLocked((L) => ({ ...L, [key]: true })); //lock 
+};
 
   useEffect(() => {
       const limit = Number(details?.options?.timeLimit);
@@ -72,6 +87,7 @@ useEffect(() => {
 
   setOneAtATime(!!data?.details?.options?.oneQuestionAtATime);
   setQIndex(0);
+  setQuestionLocked(!!data?.details?.options?.questionLocked);
 
   })();
 }, [qid]);
@@ -86,15 +102,18 @@ useEffect(() => {
     .trim();
 
   //set single awnser or fill in blank!!
-  const setSingle = (id: string, val: string) => {
-    setAnswers((a) => ({ ...a, [id]: val }));
-  };
+    const setSingle = (id: string, val: string) => {
+      setAnswers((a) => {
+        if (questionLocked && locked[id]) return a; // if locked no change was made 
+        return { ...a, [id]: val };
+      });
+    };
 
   //get the anwser to split to array 
   const getMultiArray = (id: string) => {
     const s = answers[id];
     if (!s) return [];
-    return s.split(",").map((x) => x.trim()).filter(Boolean);
+    return s.split("$").map((x) => x.trim()).filter(Boolean);
   };
 
   //store them 
@@ -102,12 +121,13 @@ useEffect(() => {
   // delete it if alreay inside array
   //mimic the process of multiple choice 
   const toggleMulti = (id: string, opt: string) => {
+    if (questionLocked && locked[id]) return;
     const arr = getMultiArray(id);
     const i = arr.indexOf(opt);
     if (i >= 0) arr.splice(i, 1);
     else arr.push(opt);
     arr.sort();
-    setAnswers((a) => ({ ...a, [id]: arr.join(",") }));
+    setAnswers((a) => ({ ...a, [id]: arr.join("$") }));
   };
 
 
@@ -285,6 +305,7 @@ const onSubmit = async () => {
                                             checked={checked}
                                             onChange={() => toggleMulti(qKey, opt)}
                                             style={{transform: "scale(1.5)"}}
+                                             disabled={questionLocked && !!locked[qKey]} 
                                         />
                                         <label className="form-check-label fs-5" htmlFor={id}>
                                           {opt}
@@ -310,8 +331,11 @@ const onSubmit = async () => {
                                         id={id}
                                         value={opt}
                                         checked={checked}
-                                        onChange={() => setSingle(qKey, opt)}
+                                        onChange={() => {
+                                          setSingle(qKey, opt);
+                                        }}
                                         style={{ transform: "scale(1.5)" }}
+                                         disabled={questionLocked && !!locked[qKey]} 
                                       />
                                       <label className="form-check-label fs-5" htmlFor={id}>
                                         {opt}
@@ -331,7 +355,12 @@ const onSubmit = async () => {
                               <ReactQuill
                                 theme="snow"
                                 value={answers[qKey] ?? ""}
-                                onChange={(val) => setSingle(qKey, val)}
+                             onChange={(val) => {
+                                if (questionLocked && locked[qKey]) return; // if lock no renew
+                                setSingle(qKey, val);                       // else set single
+                              }}
+                              readOnly={questionLocked && !!locked[qKey]}
+
                                 placeholder="Enter your answer..."
                                 style={{ height: 160 }}
                                 modules={{
