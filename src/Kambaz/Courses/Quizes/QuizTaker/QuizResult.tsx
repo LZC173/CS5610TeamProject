@@ -14,7 +14,7 @@ export default function QuizResult() {
   const [loading, setLoading] = useState(true);
   const [attempt, setAttempt] = useState<any>(null);
   const [questions, setQuestions] = useState<QuestionDetails[]>([]);
-  const [answers, setAnswers] = useState<AnswersMap>({});
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
 
 
   const showAnswersAlert = useMemo(() => {

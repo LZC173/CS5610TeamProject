@@ -12,7 +12,7 @@ export default function QuizTaker() {
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState<any>(null);
 
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [questions, setQuestions] = useState<QuestionDetails[]>([]);
   const [, setSubmitting] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
@@ -102,19 +102,12 @@ useEffect(() => {
     .trim();
 
   //set single awnser or fill in blank!!
-    const setSingle = (id: string, val: string) => {
-      setAnswers((a) => {
-        if (questionLocked && locked[id]) return a; // if locked no change was made 
-        return { ...a, [id]: val };
-      });
+   const setSingle = (id: string, val: string) => {
+      setAnswers(a => ({ ...a, [id]: val ? [val] : [] }));
     };
 
   //get the anwser to split to array 
-  const getMultiArray = (id: string) => {
-    const s = answers[id];
-    if (!s) return [];
-    return s.split("$").map((x) => x.trim()).filter(Boolean);
-  };
+  const getMultiArray = (id: string): string[] => answers[id] ?? [];
 
   //store them 
   // make change, push it to array if not in side array
@@ -123,11 +116,8 @@ useEffect(() => {
   const toggleMulti = (id: string, opt: string) => {
     if (questionLocked && locked[id]) return;
     const arr = getMultiArray(id);
-    const i = arr.indexOf(opt);
-    if (i >= 0) arr.splice(i, 1);
-    else arr.push(opt);
-    arr.sort();
-    setAnswers((a) => ({ ...a, [id]: arr.join("$") }));
+    const next = arr.includes(opt) ? arr.filter(x => x !== opt) : [...arr, opt];
+    setAnswers(a => ({ ...a, [id]: next }));
   };
 
 
@@ -146,27 +136,30 @@ const onSubmit = async () => {
     setSubmitting(true);
     
 
-    const out: Record<string, string> = {};
+
+   const out: Record<string, string[]> = {};
 
     questions.forEach((q, index) => {
-      const key = q.questionId ?? String(index);   //get value from local state 
-      let val = answers[key] ?? "";
-      if (q.questionType === "fill-in-blank") {
-        // If it is fill in blank ,then try to use html to text
-        val = htmlToText(val);
-      } else if (q.questionType === "multi-select") {
-        //
-        val = getMultiArray(key).join(",");
+      const key = q.questionId ?? String(index);
+
+      if (q.questionType === "multi-select") {
+        out[key] = getMultiArray(key);  // 
+      } else if (q.questionType === "fill-in-blank") {
+        const raw = answers[key]?.[0] ?? "";
+        const t = htmlToText(raw);
+        out[key] = t ? [t] : [];
+      } else { // true-false / 
+        const v = answers[key]?.[0];
+        out[key] = v ? [v] : [];
       }
-      // using question id as key 
-      out[q.questionId ?? key] = val;
     });
 
     // find number of unanwered question 
     const unanswered = questions.filter((q, i) => {
-      const k = q.questionId ?? String(i);
-      return !out[k];
-    }).length;
+        const k = q.questionId ?? String(i);
+        const v = out[k]; // string[]
+        return !v || v.length === 0 || v.every(s => !s.trim());
+      }).length;
     if (unanswered > 0) {
       const goOn = window.confirm(`not complete ?? are you sure ??`);
       if (!goOn) { setSubmitting(false); return; }
@@ -293,8 +286,8 @@ const onSubmit = async () => {
                           {q.questionType === "multi-select" && (
                                <div>
                                 {q.possibleAnswers.map((opt, i) => {
-                                  const arr = getMultiArray(qKey);
-                                  const checked = arr.includes(opt);
+                                const arr = getMultiArray(qKey);
+                                const checked = arr.includes(opt);
                                   const id = `${qKey}-opt-${i}`;
                                   return (
                                       <div key={id} className="form-check mb-2">
@@ -321,7 +314,7 @@ const onSubmit = async () => {
                               {(q.possibleAnswers?.length ? q.possibleAnswers : ["True", "False"]).map(
                                 (opt, i) => {
                                   const id = `${qKey}-tf-${i}`;
-                                  const checked = answers[qKey] === opt;
+                                  const checked = (answers[qKey]?.[0] === opt);
                                   return (
                                     <div key={id} className="form-check mb-2">
                                       <input
@@ -354,10 +347,10 @@ const onSubmit = async () => {
                               </div>
                               <ReactQuill
                                 theme="snow"
-                                value={answers[qKey] ?? ""}
+                                 value={answers[qKey]?.[0] ?? ""} 
                              onChange={(val) => {
                                 if (questionLocked && locked[qKey]) return; // if lock no renew
-                                setSingle(qKey, val);                       // else set single
+                                setSingle(qKey, val);                     // else set single
                               }}
                               readOnly={questionLocked && !!locked[qKey]}
 
