@@ -2,7 +2,7 @@ import {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {FaRegKeyboard} from "react-icons/fa";
-import {Card, Col, Form, Row} from 'react-bootstrap';
+import {Card, Col, Form, InputGroup, Row} from 'react-bootstrap';
 import './style.css';
 
 interface QuizDetailsEditorRef {
@@ -41,6 +41,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
   useState(details.options?.oneQuestionAtATime ?? false);
   const [webCamRequired, setWebCamRequired] =
   useState(details.options?.webCamRequired ?? false);
+  const [hasTimeLimit, setHasTimeLimit] = useState(details.options?.timeLimit !== -1);
     useEffect(() => {
         setContent(details.description || '');
         setTitle(details.title || '');
@@ -50,7 +51,8 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         setQuizType(details.quizType || 'GRADED_QUIZ');
         setGroup(details.group || 'ASSIGNMENTS');
         setShuffleAnswers(details.options?.shuffleAnswers ?? false);
-        setTimeLimit(details.options?.timeLimit ?? false);
+          setTimeLimit(details.options?.timeLimit ?? 20);  
+        setHasTimeLimit(details.options?.timeLimit !== -1); 
         setAssignTo(details.assignTo ?? 'Everyone');
         setAccessCode(details.options?.accessCode ?? "");
         setQuestionLock(details.options?.lockEnabled);
@@ -199,59 +201,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                                         className="mb-0 ms-3"
                                     />
                                 </div>
-                                <div className="mb-2 d-flex align-items-center">
-                                    <Form.Label htmlFor="wd-attempts" className="mb-0" style={{minWidth: '150px'}}>No of
-                                        Attempts</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        min="1"
-                                        id="wd-attempts"
-                                        value={attempts}
-                                        onChange={e => setAttempts(parseInt(e.target.value) || 1)}
-                                        placeholder="1"
-                                        style={{width: '80px'}}
-                                        className="ms-3"
-                                    />
-                                </div>
-                                <div className="mb-2 d-flex align-items-center">
-                                    <Form.Label htmlFor="wd-time-limit" className="mb-0" style={{minWidth: '150px'}}>Time
-                                        limit (minutes)</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        min="10"
-                                        id="wd-time-limit"
-                                        value={timeLimit}
-                                        onChange={e => setTimeLimit(parseInt(e.target.value) || 10)}
-                                        placeholder="10"
-                                        style={{width: '80px'}}
-                                        className="ms-3"
-                                    />
-                                </div>
-                                <div className="mb-2 d-flex align-items-center">
-                                    <Form.Label htmlFor="wd-access-code" className="mb-0" style={{minWidth: '150px'}}>Access
-                                        Code</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        id="wd-access-code"
-                                        value={accessCode}
-                                        onChange={e => setAccessCode(e.target.value)}
-                                        placeholder="Enter access code"
-                                        style={{width: '200px'}}
-                                        className="ms-3"
-                                    />
-                                </div>
-                                <div className="mb-2 d-flex align-items-center">
-                                    <Form.Label className="mb-0" style={{ minWidth: '150px' }}>
-                                        One question at a time
-                                    </Form.Label>
-                                    <Form.Check
-                                        type="checkbox"
-                                        id="wd-one-q-at-a-time"
-                                        checked={oneQuestionAtATime}
-                                        onChange={e => setOneQuestionAtATime(e.target.checked)}
-                                        className="mb-0 ms-3"
-                                    />
-                                    </div>
+
                                 <div className="mb-2 d-flex align-items-center">
                                         <Form.Label htmlFor="wd-showAnswers" className="mb-0" style={{minWidth: '150px'}}>
                                             Show Answers
@@ -277,6 +227,82 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                                         className="mb-0 ms-3"
                                     />
                                     </div>
+
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label className="mb-0" style={{ minWidth: '150px' }}>
+                                        One question at a time
+                                    </Form.Label>
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="wd-one-q-at-a-time"
+                                        checked={oneQuestionAtATime}
+                                        onChange={e => setOneQuestionAtATime(e.target.checked)}
+                                        className="mb-0 ms-3"
+                                    />
+                                    </div>
+
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label htmlFor="wd-attempts" className="mb-0" style={{minWidth: '150px'}}>No of
+                                        Attempts</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        min="1"
+                                        id="wd-attempts"
+                                        value={attempts}
+                                        onChange={e => setAttempts(parseInt(e.target.value) || 1)}
+                                        placeholder="1"
+                                        style={{width: '80px'}}
+                                        className="ms-3"
+                                    />
+                                </div>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label className="mb-0" style={{ minWidth: '150px' }}>
+                                        Time limit 
+                                    </Form.Label>
+
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="wd-time-limit-enabled"
+                                        className="mb-0 ms-3"
+                                        checked={hasTimeLimit}
+                                        onChange={(e) => {
+                                        const enabled = e.target.checked;
+                                        setHasTimeLimit(enabled);
+                                        if (!enabled) setTimeLimit(-1);
+                                        else if (timeLimit === -1) setTimeLimit(10);
+                                        }}
+                                    />
+                                        {hasTimeLimit && (
+                                        <InputGroup className="ms-3" style={{ width: 140 }}>
+                                            <Form.Label htmlFor="wd-time-limit" className="visually-hidden">
+                                            Time limit (minutes)
+                                            </Form.Label>
+                                            <Form.Control
+                                            type="number"
+                                            min="10"
+                                            id="wd-time-limit"
+                                            value={timeLimit === -1 ? 10 : timeLimit}
+                                            onChange={(e) => setTimeLimit(parseInt(e.target.value) || 10)}
+                                            placeholder="10"
+                                            />
+                                            <InputGroup.Text>minute</InputGroup.Text>
+                                        </InputGroup>
+                                        )}
+                                    </div>
+                                <div className="mb-2 d-flex align-items-center">
+                                    <Form.Label htmlFor="wd-access-code" className="mb-0" style={{minWidth: '150px'}}>Access
+                                        Code</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        id="wd-access-code"
+                                        value={accessCode}
+                                        onChange={e => setAccessCode(e.target.value)}
+                                        placeholder="Enter access code"
+                                        style={{width: '200px'}}
+                                        className="ms-3"
+                                    />
+                                </div>
+
                             </Card.Body>
                         </Card>
                     </Col>

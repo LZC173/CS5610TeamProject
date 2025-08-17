@@ -32,12 +32,14 @@ const goNext = () => setQIndex((i) => (i < questions.length - 1 ? i + 1 : i));
 
 
   useEffect(() => {
-    if (!timerStarted || timeLeft <= 0) return;
+      const limit = Number(details?.options?.timeLimit);
+      const noLimit = limit === -1;
+      if (noLimit || !timerStarted || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
-          onSubmit();
+          onSubmit();// on submit
           return 0;
         }
         return prev - 1;
@@ -77,7 +79,7 @@ useEffect(() => {
 
   //html to text!!!
   const htmlToText = (html: string) =>
-  String(html || "")
+    String(html || "")
     .replace(/<[^>]+>/g, " ")   
     .replace(/&nbsp;/g, " ")     
     .replace(/\s+/g, " ")      
