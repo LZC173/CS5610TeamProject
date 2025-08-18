@@ -6,6 +6,7 @@ import * as quizClient from "../client.ts";
 import type QuestionDetails from "../Interface/QuestionDetails";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { FaLock, FaCheck } from "react-icons/fa";
 export default function QuizTaker() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const canEdit = currentUser.role === "FACULTY";
@@ -123,6 +124,29 @@ useEffect(() => {
   };
 
 
+  const isAnswered = (i: number) => {
+  const key = questions[i]?.questionId ?? String(i);
+  const v = answers[key];
+  return Array.isArray(v) && v.some(s => s && s.trim());
+};
+
+    // Handle sidebar click (jump / navigate)
+    const handleJump = (i: number, e: any) => {
+      if (oneAtATime) {
+        e.preventDefault();
+        lockOnTurn();      // lock current question on flip
+        setQIndex(i);      // go to clicked question
+      } else {
+        e.preventDefault();
+        const el = document.getElementById(`q-${i}`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        // optional: reflect in URL hash
+        window.history.replaceState(null, "", `#q-${i}`);
+      }
+};
+
+
+
   const submitCode = ()=>{
     if(accessCode === details.options.accessCode) {
       setShowQuiz(true);
@@ -192,6 +216,52 @@ const onSubmit = async () => {
       <div className="container-fluid p-4">
         {showQuiz?
           <div>
+                 <div
+                  className="shadow-sm border rounded bg-white d-none d-md-block"
+                  style={{
+                    position: "fixed",
+                    top: 16,
+                    right: 16,
+                    width: 220,
+                    maxHeight: "75vh",
+                    overflowY: "auto",
+                    zIndex: 1030
+                  }}
+                >
+                  <div className="p-2 border-bottom fw-semibold">Questions</div>
+                  <div className="list-group list-group-flush">
+                    {questions.map((q, i) => {
+                      const key = q.questionId ?? String(i);
+                      const active = oneAtATime ? i === qIndex : false;
+                      const lockedNow = !!locked[key];
+                      const answered = isAnswered(i);
+                      const href = oneAtATime ? "#" : `#q-${i}`;
+                      return (
+                        <a
+                          key={key}
+                          href={href}
+                          className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${active ? "active" : ""}`}
+                          onClick={(e) => handleJump(i, e)}
+                          title={q.questionTitle}
+                        >
+                          <span
+                          className="d-inline-block text-truncate"
+                          style={{ maxWidth: 150 }}
+                        >
+                          {q.questionTitle || `Question ${i + 1}`}
+                        </span>
+                          <span className="ms-2" title={lockedNow ? "Locked" : answered ? "Answered" : ""}>
+                              {lockedNow ? (
+                                <FaLock className="text-secondary" style={{ fontSize: 14 }} />
+                              ) : answered ? (
+                                <FaCheck className="text-success" style={{ fontSize: 14 }} />
+                              ) : null}
+                            </span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
             {timerStarted && (
                 <div className="row mb-3">
                   <div className="col-5 ms-auto">
@@ -206,6 +276,9 @@ const onSubmit = async () => {
                   </div>
                 </div>
             )}
+
+
+
             <div className="row mb-4">
               <div className="col-12 d-flex justify-content-between align-items-center">
                 <h4 className="m-0">{details?.title}</h4>
@@ -242,12 +315,13 @@ const onSubmit = async () => {
             )}
 
 
-            {renderList.map((q, index) => {
+           {renderList.map((q, index) => {
                 const realIndex = oneAtATime ? qIndex : index;
                 const qKey = q.questionId ?? String(realIndex);
 
+
                 return (
-                  <div className="row mb-4" key={qKey}>
+                    <div className="row mb-4" key={qKey} id={`q-${realIndex}`}>
                     <div className="col-12">
                       <div className="border rounded">
                         <div className="px-3 py-2 bg-light d-flex justify-content-between align-items-center border-bottom">
