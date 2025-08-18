@@ -431,7 +431,6 @@ const onSubmit = async () => {
                               readOnly={questionLocked && !!locked[qKey]}
 
                                 placeholder="Enter your answer..."
-                                style={{ height: 100 }}
                                 modules={{
                                   toolbar: [
                                     [{ size: ["small", false, "large"] }],
@@ -477,7 +476,9 @@ const onSubmit = async () => {
                 )}
               </>
             ) : (
-              <Button variant="danger" onClick={onSubmit}>
+              <Button variant="danger" 
+              className="ms-2"  
+              onClick={onSubmit}>
                 Submit
               </Button>
             )}
