@@ -60,18 +60,20 @@ export default function QuizResult() {
   );
 
   const isCorrect = (q: QuestionDetails) => {
-  const ua = answers[q.questionId ?? ""] ?? [];
-  const caRaw = (q as any).correctAnswers; 
+  const ua = answers[q.questionId ?? ""] ?? []; 
+  const caRaw = (q as any).correctAnswers;  
   const ca = Array.isArray(caRaw) ? caRaw : (caRaw ? [caRaw] : []);
-
-  if (q.questionType === "multi-select") {
-    const A = new Set(ua.filter(Boolean));
-    const B = new Set(ca.filter(Boolean));
-    if (A.size !== B.size) return false;
+  const A = new Set(ua.filter(Boolean));
+  const B = new Set(ca.filter(Boolean));
+  if(q.questionType === "fill-in-blank" && A.size > 0){
+    const subset = [...A].every(answer => B.has(answer))
+    return subset;
+  }else{
+      if (A.size !== B.size) return false;
     for (const x of A) if (!B.has(x)) return false;
     return true;
   }
-  return (ua[0] ?? "") === (ca[0] ?? "");
+
 };
 
   if (loading) return null;
