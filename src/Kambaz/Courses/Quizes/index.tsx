@@ -62,7 +62,6 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
 
   // 1) eget access code
   const detail = await quizzesClient.fetchDetails(quizId);
-  console.log(detail)
   const allowedAttempts: number = detail?.details?.options?.noOfAttempts ?? 1;
 
 
@@ -163,7 +162,6 @@ const handleEnterQuiz = async (availableUntil: string, quizId: string) => {
 
 
               const published = q.published;
-              console.log(q)
 
               return (
                 <ListGroup.Item key={q.quizId} className="wd-lesson p-3 ps-1">

@@ -55,11 +55,11 @@ export default function QuizEditor() {
     }, [qid])
 
     const saveQuiz = async (status: boolean, goToDetails: boolean) => {
-  try {
-    const newIdsSet = new Set(newIds);
-    const updatedIdsSet = new Set(updatedIds);
-    const data =
-      selectedTab === "Details" &&
+        console.log("save here")
+        try {
+        const newIdsSet = new Set(newIds);
+        const updatedIdsSet = new Set(updatedIds);
+        const data = selectedTab === "Details" &&
       detailsEditorRef.current &&
       typeof detailsEditorRef.current.saveCurrentState === "function"
         ? detailsEditorRef.current.saveCurrentState()
@@ -81,6 +81,7 @@ export default function QuizEditor() {
       },
     };
 
+    console.log(requestBody)
     await quizClient.createNew(requestBody, cid as string);
 
     if (goToDetails) {
@@ -90,7 +91,7 @@ export default function QuizEditor() {
     }
 
   } catch (e) {
-    console.error(e);
+      console.log(e)
     alert("Save failed");
   }
 };
