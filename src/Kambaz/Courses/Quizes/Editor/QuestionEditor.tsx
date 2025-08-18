@@ -175,7 +175,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
             </div>
 
             <div className="description_editor">
-                <label className="form-label fw-medium">Quiz Instructions:</label>
+                <label className="form-label fw-medium">Question Instructions:</label>
                 <div className="border rounded-top bg-light px-3 py-2">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <div className="d-flex gap-3">

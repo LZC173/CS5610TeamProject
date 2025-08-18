@@ -99,7 +99,7 @@ export default function QuizDetails() {
               </tr>
               <tr>
                 <td className="fw-bold">Time Limit</td>
-                <td>{details?.options?.timeLimit ? `${details.timeLimit} Minutes` : "None"}</td>
+                <td>{details?.options?.timeLimit ? `${details.options?.timeLimit} Minutes` : "None"}</td>
               </tr>
               <tr>
                 <td className="fw-bold">Multiple Attempts</td>
