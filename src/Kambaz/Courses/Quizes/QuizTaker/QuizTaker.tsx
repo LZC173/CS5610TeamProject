@@ -431,7 +431,7 @@ const onSubmit = async () => {
                               readOnly={questionLocked && !!locked[qKey]}
 
                                 placeholder="Enter your answer..."
-                                style={{ height: 160 }}
+                                style={{ height: 100 }}
                                 modules={{
                                   toolbar: [
                                     [{ size: ["small", false, "large"] }],
@@ -485,6 +485,7 @@ const onSubmit = async () => {
                 {canEdit && (
                   <Button
                     variant="danger"
+                    className="ms-2"  
                     onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`)}
                   >
                     Keep editing this quiz
