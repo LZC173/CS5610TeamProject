@@ -1,4 +1,4 @@
-
+import {useSelector} from "react-redux";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {Button, FormControl, Modal} from "react-bootstrap";
@@ -7,6 +7,8 @@ import type QuestionDetails from "../Interface/QuestionDetails";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 export default function QuizTaker() {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const canEdit = currentUser.role === "FACULTY";
   const { cid, qid } = useParams<{ cid: string; qid: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -405,6 +407,15 @@ const onSubmit = async () => {
                 Submit
               </Button>
             )}
+
+                {canEdit && (
+                  <Button
+                    variant="danger"
+                    onClick={() => navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}`)}
+                  >
+                    Keep editing this quiz
+                  </Button>
+                )}
           </div>
 
           </div>

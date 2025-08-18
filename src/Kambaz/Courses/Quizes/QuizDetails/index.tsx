@@ -57,8 +57,13 @@ export default function QuizDetails() {
 
       {/* Top Navigation Buttons */}
       <div className="d-flex justify-content-center gap-3 mb-4">
-        <button type="button" className="btn btn-secondary">
+        <button type="button" className="btn btn-secondary"
+         onClick={() =>
+            navigate(`/Kambaz/Courses/${cid}/Quizzes/${qid}/take`)
+          }
+        >
           Preview
+          
         </button>
         <button
           type="button"
