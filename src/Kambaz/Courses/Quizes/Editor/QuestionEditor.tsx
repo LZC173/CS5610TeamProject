@@ -16,7 +16,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
     const [questionType, setQuestionType] = useState('multi-select');
     const [points, setPoints] = useState(4);
     const [questionText, setQuestionText] = useState('');
-    const [answers, setAnswers] = useState(['', '']);
+    const [answers, setAnswers] = useState(['']);
     const [correctAnswers, setCorrectAnswers] = useState<string[]>([]);
     const [wordCount, setWordCount] = useState(0);
     const [title, setTitle] = useState("");
@@ -30,7 +30,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
             setPoints(question.points);
             setTitle(question.questionTitle)
             setQuestionText(question.questionDescription);
-            setAnswers(question.possibleAnswers.length > 0 ? question.possibleAnswers : ['', '']);
+            setAnswers(question.possibleAnswers.length > 0 ? question.possibleAnswers : ['']);
 
             if (Array.isArray(question.correctAnswers)) {
                 setCorrectAnswers(question.correctAnswers);
@@ -44,7 +44,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
             setQuestionType('multi-select');
             setPoints(4);
             setQuestionText('');
-            setAnswers(['', '']);
+            setAnswers(['']);
             setCorrectAnswers([]);
             setWordCount(0);
         }
@@ -55,7 +55,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
         setCorrectAnswers([]);
 
         if (type === 'multi-select') {
-            setAnswers(['', '']);
+            setAnswers(['']);
         } else if (type === 'true-false') {
             setAnswers(['True', 'False']);
         } else if (type === 'fill-in-blank') {
@@ -71,7 +71,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
     };
 
     const removeAnswerOption = (index: number) => {
-        if (questionType === 'multi-select' && answers.length > 2) {
+        if (questionType === 'multi-select' && answers.length > 1) {
             const newAnswers = answers.filter((_, i) => i !== index);
             setAnswers(newAnswers);
             const removedAnswer = answers[index];
@@ -124,6 +124,94 @@ export default function QuestionEditor({ question, onSave }: Props) {
             setCorrectAnswers(newAnswers);
         }
     };
+
+    const errorValidation = (field :string, value : any) => {
+        let valid = true;
+        let message = ""    
+        switch(field) {
+                case "title":
+                    if(value === null || value === "") {
+                        message = "Title cannot be empty."
+                        valid = false;
+                    }
+                    break;
+                case "description":
+                        if(value === null || value === "") {
+                        message = "Description cannot be empty."
+                        valid = false;
+                    }
+                    break;
+                case "answers":
+                    if(questionType !== 'fill-in-blank' && (value === null || value.length === 0 )) {
+                        message = "Provide one or more possible answers."
+                        valid = false;
+                        break;
+                    }  
+                   if(questionType !== 'fill-in-blank' ) {
+                    for (const element of value) {
+                        if (element === null || element === "") {
+                            valid = false;
+                            message = "Cannot have empty options for answers. Please provide value";
+                            break;
+                        }
+                        }
+                   }
+                    break;
+                case "correctAnswers":
+                    if(value === null || value.length === 0 ) {
+                        message = "Provide one or more possible correct answers."
+                        valid = false;
+                    }    
+                  for (const element of value) {
+                    if (element === null || element === "") {
+                        valid = false;
+                        message = "Cannot have empty options for correct answers. Please provide value";
+                        break;
+                    }
+                    }
+                    break;
+                default:
+                    break;    
+            }
+
+            if(!valid) {
+                alert(message);
+            }
+        return valid;    
+        }
+
+
+        const saveQuestionDetails = () => {
+                        let finalCorrectAnswers = correctAnswers;
+                        if (questionType === 'fill-in-blank') {
+                            finalCorrectAnswers = correctAnswers.filter(answer => answer.trim() !== '');
+                        }
+                        
+                        let valid =  true;
+                        valid = errorValidation("title", title) && errorValidation("description", questionText) && errorValidation("answers", answers) && errorValidation("correctAnswers",finalCorrectAnswers )
+                        if(!valid){
+                            return;
+                        }
+
+                        const payload: QuestionDetails = {
+                            questionId: question?.questionId,
+                            questionTitle: title,
+                            questionDescription: questionText,
+                            questionType: questionType,
+                            possibleAnswers: questionType === 'fill-in-blank' ? [] : answers,
+                            correctAnswers: finalCorrectAnswers,
+                            points: points
+                        };
+
+                        if (question && question.questionId) {
+                            dispatch(updateQuestion(payload));
+                            dispatch(changePoints(payload.points - initialPoints))
+                        } else {
+                            dispatch(addQuestion(payload));
+                            dispatch(changePoints(payload.points))
+                        }
+                        onSave();
+                    }
 
     return (
         <div className="container-fluid p-4">
@@ -256,7 +344,7 @@ export default function QuestionEditor({ question, onSave }: Props) {
                                         onChange={(e) => updateAnswerOption(index, e.target.value)}
                                         placeholder={`Answer option ${index + 1}`}
                                     />
-                                    {answers.length > 2 && (
+                                    {answers.length > 1 && (
                                         <button
                                             className="btn btn-outline-danger btn-sm"
                                             onClick={() => removeAnswerOption(index)}
@@ -352,33 +440,11 @@ export default function QuestionEditor({ question, onSave }: Props) {
                 >
                     Cancel
                 </Button>
+
+
                 <Button
                     variant="danger"
-                    onClick={() => {
-                        let finalCorrectAnswers = correctAnswers;
-                        if (questionType === 'fill-in-blank') {
-                            finalCorrectAnswers = correctAnswers.filter(answer => answer.trim() !== '');
-                        }
-
-                        const payload: QuestionDetails = {
-                            questionId: question?.questionId,
-                            questionTitle: title,
-                            questionDescription: questionText,
-                            questionType: questionType,
-                            possibleAnswers: answers,
-                            correctAnswers: finalCorrectAnswers,
-                            points: points
-                        };
-
-                        if (question && question.questionId) {
-                            dispatch(updateQuestion(payload));
-                            dispatch(changePoints(payload.points - initialPoints))
-                        } else {
-                            dispatch(addQuestion(payload));
-                            dispatch(changePoints(payload.points))
-                        }
-                        onSave();
-                    }}
+                    onClick={saveQuestionDetails}
                 >
                     SaveQuestion
                 </Button>

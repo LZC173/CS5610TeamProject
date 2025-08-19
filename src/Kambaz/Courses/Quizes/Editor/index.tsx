@@ -32,8 +32,15 @@ export default function QuizEditor() {
  const deletedIds = useSelector((s: any) => s.editorReducer.deleteQuestionIds)  as string[];
     const points     = useSelector((state: any)=> state.editorReducer.points);
     const detailsEditorRef = useRef<{ saveCurrentState: () => any }>(null);
-
-
+    const errorValidation = (field :string, value : any) => {
+            if(value === null || value ===  ""){
+                alert(`field ${field} cannot be empty. Please provide a value.`);
+                return false;
+            }
+            return true;
+            
+        }
+    
     const dispatch = useDispatch();
 
     const fetchDetails = async (quizId : string) => {
@@ -55,7 +62,7 @@ export default function QuizEditor() {
     }, [qid])
 
     const saveQuiz = async (status: boolean, goToDetails: boolean) => {
-        console.log("save here")
+
         try {
         const newIdsSet = new Set(newIds);
         const updatedIdsSet = new Set(updatedIds);
@@ -64,6 +71,16 @@ export default function QuizEditor() {
       typeof detailsEditorRef.current.saveCurrentState === "function"
         ? detailsEditorRef.current.saveCurrentState()
         : details;
+        let proceed = true;
+        proceed = errorValidation("title",data.title) && errorValidation("Available From",data.availableFrom) && errorValidation("Available Until",data.availableUntil) && errorValidation("dueDate ",data.dueDate );
+
+    if(!proceed ){
+    
+       return; 
+    }
+        console.log("!!!!!")
+
+    
     dispatch(setDetails(data));
     const requestBody = {
       quizId: qid || null,

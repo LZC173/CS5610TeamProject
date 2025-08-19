@@ -4,10 +4,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import {Button, Badge, Alert} from "react-bootstrap";
 import * as quizClient from "../client.ts";
 import type QuestionDetails from "../Interface/QuestionDetails";
-
+import {useSelector} from "react-redux";
 
 export default function QuizResult() {
   const { cid, qid } = useParams<{ cid: string; qid: string }>();
+    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    const canEdit = currentUser.role === "FACULTY";
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -17,7 +19,7 @@ export default function QuizResult() {
 
 
   const showAnswersAlert = useMemo(() => {
-    if (!attempt?.quiz?.details?.options?.showAnswers) return null;
+    if (!attempt?.quiz?.details?.options?.showAnswers || canEdit) return null;
 
     const showAnswersDate = new Date(attempt.quiz.details.options.showAnswers);
     const now = new Date();

@@ -15,18 +15,19 @@ interface Props {
 
 const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, ref) => {
 
+
+    const currentDate = new Date();
+    const nextDate = new Date(currentDate)
+    nextDate.setDate(nextDate.getDate() + 3 );
     const [content, setContent] = useState(details.description || '');
     const [wordCount, setWordCount] = useState(0);
-    const [title, setTitle] = useState(details.title || '');
+    const [title, setTitle] = useState(details.title || "New Quiz");
     const [availableFrom, setAvailableFrom] = useState(
-        details.dates?.availableFrom?.slice(0, 16) || ''
-    );
+    details.dates?.availableFrom );
     const [availableUntil, setAvailableUntil] = useState(
-        details.dates?.availableUntil?.slice(0, 16) || ''
-    );
+    details.dates?.availableUntil);
     const [dueDate, setDueDate] = useState(
-        details.dates?.dueDate?.slice(0, 16) || ''
-    );
+    details.dates?.dueDate );
     const [quizType, setQuizType] = useState(details.quizType || 'GRADED_QUIZ');
     const [group, setGroup] = useState(details.assignmentGroup || 'ASSIGNMENTS');
     const [shuffleAnswers, setShuffleAnswers] = useState(details.options?.shuffleAnswers ?? false);
@@ -41,17 +42,17 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
   useState(details.options?.oneQuestionAtATime ?? false);
   const [webCamRequired, setWebCamRequired] =
   useState(details.options?.webCamRequired ?? false);
-  const [hasTimeLimit, setHasTimeLimit] = useState(details.options?.timeLimit !== -1);
+  const [hasTimeLimit, setHasTimeLimit] = useState(details.options?.timeLimit !== -1); 
     useEffect(() => {
         setContent(details.description || '');
-        setTitle(details.title || '');
-        setAvailableFrom(details.dates?.availableFrom?.slice(0, 16) || '');
-        setAvailableUntil(details.dates?.availableUntil?.slice(0, 16) || '');
-        setDueDate(details.dates?.dueDate?.slice(0, 16) || '');
+       setTitle(details.title || "New Quiz");
+  setAvailableFrom(details.dates?.availableFrom);
+  setAvailableUntil(details.dates?.availableUntil);
+  setDueDate(details.dates?.dueDate );
         setQuizType(details.quizType || 'GRADED_QUIZ');
         setGroup(details.assignmentGroup || 'ASSIGNMENTS');
         setShuffleAnswers(details.options?.shuffleAnswers ?? false);
-          setTimeLimit(details.options?.timeLimit ?? 20);  
+        setTimeLimit(details.options?.timeLimit ?? 20);  
         setHasTimeLimit(details.options?.timeLimit !== -1); 
         setAssignTo(details.assign ?? 'Everyone');
         setAccessCode(details.options?.accessCode ?? "");
@@ -60,7 +61,6 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
         setOneQuestionAtATime(details.options?.oneQuestionAtATime ?? false);
         setWebCamRequired(details.options?.webCamRequired ?? false);
     }, [details]);
-
     useImperativeHandle(ref, () => ({
         saveCurrentState: () => {
 
@@ -69,9 +69,9 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                 title,
                 description: content,
                 dates: {
-                    availableFrom: availableFrom || new Date().toISOString().slice(0, 16),
-                    availableUntil: availableUntil || new Date().toISOString().slice(0, 16),
-                    dueDate: dueDate || new Date().toISOString().slice(0, 16)
+                    availableFrom: availableFrom,
+                    availableUntil: availableUntil ,
+                    dueDate: dueDate 
                 },
                 quizType,
                 assignmentGroup: group,
@@ -334,7 +334,7 @@ const QuizDetailsEditor = forwardRef<QuizDetailsEditorRef, Props>(({ details }, 
                                         id="wd-due-date"
                                         type="datetime-local"
                                         value={dueDate}
-                                        onChange={e => setDueDate(e.target.value)}
+                                        onChange={e => {console.log(dueDate,e.target.value),setDueDate(e.target.value)}}
                                     />
                                 </Form.Group>
 
