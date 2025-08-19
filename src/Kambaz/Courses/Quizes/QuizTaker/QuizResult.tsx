@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {Button, Badge, Alert} from "react-bootstrap";
 import * as quizClient from "../client.ts";
 import type QuestionDetails from "../Interface/QuestionDetails";
+import { useSelector } from "react-redux";
 
 
 export default function QuizResult() {
@@ -14,10 +15,13 @@ export default function QuizResult() {
   const [attempt, setAttempt] = useState<any>(null);
   const [questions, setQuestions] = useState<QuestionDetails[]>([]);
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const canEdit = currentUser.role === "FACULTY";
 
 
   const showAnswersAlert = useMemo(() => {
-    if (!attempt?.quiz?.details?.options?.showAnswers) return null;
+    if (!attempt?.quiz?.details?.options?.showAnswers || canEdit) return null;
+    // if (!attempt?.quiz?.details?.options?.showAnswers ) return null;
 
     const showAnswersDate = new Date(attempt.quiz.details.options.showAnswers);
     const now = new Date();
@@ -60,20 +64,18 @@ export default function QuizResult() {
   );
 
   const isCorrect = (q: QuestionDetails) => {
-  const ua = answers[q.questionId ?? ""] ?? []; 
-  const caRaw = (q as any).correctAnswers;  
+  const ua = answers[q.questionId ?? ""] ?? [];
+  const caRaw = (q as any).correctAnswers; 
   const ca = Array.isArray(caRaw) ? caRaw : (caRaw ? [caRaw] : []);
-  const A = new Set(ua.filter(Boolean));
-  const B = new Set(ca.filter(Boolean));
-  if(q.questionType === "fill-in-blank" && A.size > 0){
-    const subset = [...A].every(answer => B.has(answer))
-    return subset;
-  }else{
-      if (A.size !== B.size) return false;
+
+  if (q.questionType === "multi-select") {
+    const A = new Set(ua.filter(Boolean));
+    const B = new Set(ca.filter(Boolean));
+    if (A.size !== B.size) return false;
     for (const x of A) if (!B.has(x)) return false;
     return true;
   }
-
+  return (ua[0] ?? "") === (ca[0] ?? "");
 };
 
   if (loading) return null;
