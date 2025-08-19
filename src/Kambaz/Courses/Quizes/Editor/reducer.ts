@@ -1,12 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
+
+const getDate=(days:number )=> {
+    const nextDate = new Date()
+    nextDate.setDate(nextDate.getDate() + days );
+    const local = new Date(nextDate.getTime() - nextDate.getTimezoneOffset() * 60000);
+        return local.toISOString().slice(0, 16);
+}
 const initialState = {
     details: {
         dates: {
-            availableFrom: new Date().toDateString(),
-            availableUntil: new Date().toDateString(),
-            dueDate: new Date().toDateString()
+            availableFrom:  getDate(0),
+            availableUntil: getDate(3),
+            dueDate: getDate(3)
         },
         description: "",
         title: ""
