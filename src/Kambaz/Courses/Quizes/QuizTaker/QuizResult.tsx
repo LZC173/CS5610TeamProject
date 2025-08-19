@@ -8,8 +8,6 @@ import {useSelector} from "react-redux";
 
 export default function QuizResult() {
   const { cid, qid } = useParams<{ cid: string; qid: string }>();
-    const { currentUser } = useSelector((state: any) => state.accountReducer);
-    const canEdit = currentUser.role === "FACULTY";
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
