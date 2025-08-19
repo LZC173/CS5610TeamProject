@@ -3,7 +3,7 @@ const axiosWithCredentials = axios.create({ withCredentials: true });
 
 const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 export const fetchQuizzes = async (courseId: string) => {
-    const response =  await axios.get(`${REMOTE_SERVER}/api/quizzes/${courseId}`);
+    const response =  await axiosWithCredentials.get(`${REMOTE_SERVER}/api/quizzes/${courseId}`);
     return response.data;
 };
 export const fetchDetails = async (quizId: string) => {
